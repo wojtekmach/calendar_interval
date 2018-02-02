@@ -59,7 +59,7 @@ defmodule CalendarInterval do
     case String.split(string, "/", trim: true) do
       [string] ->
         {ndt, precision} = do_parse!(string)
-        last = next(ndt, precision) |> prev({:microsecond, 6})
+        last = next_ndt(ndt, precision) |> prev_ndt({:microsecond, 6})
         %CalendarInterval{first: ndt, last: last, precision: precision}
 
       [left, right] ->
@@ -81,30 +81,32 @@ defmodule CalendarInterval do
     {NaiveDateTime.from_iso8601!(string), {:microsecond, 6}}
   end
 
-  defp next(ndt, :year), do: update_in(ndt.year, &(&1 + 1))
+  @doc false
+  def next_ndt(ndt, :year), do: update_in(ndt.year, &(&1 + 1))
 
-  defp next(%NaiveDateTime{year: year, month: 12} = ndt, :month) do
+  def next_ndt(%NaiveDateTime{year: year, month: 12} = ndt, :month) do
     %{ndt | year: year + 1, month: 1}
   end
-  defp next(%NaiveDateTime{month: month} = ndt, :month) do
+  def next_ndt(%NaiveDateTime{month: month} = ndt, :month) do
     %{ndt | month: month + 1}
   end
 
-  defp next(ndt, precision) do
+  def next_ndt(ndt, precision) do
     {count, unit} = precision_to_count_unit(precision)
     NaiveDateTime.add(ndt, count, unit)
   end
 
-  defp prev(ndt, :year), do: update_in(ndt.year, & &1 - 1)
+  @doc false
+  def prev_ndt(ndt, :year), do: update_in(ndt.year, & &1 - 1)
 
-  defp prev(%NaiveDateTime{year: year, month: 1} = ndt, :month) do
+  def prev_ndt(%NaiveDateTime{year: year, month: 1} = ndt, :month) do
     %{ndt | year: year - 1, month: 12}
   end
-  defp prev(%NaiveDateTime{month: month} = ndt, :month) do
+  def prev_ndt(%NaiveDateTime{month: month} = ndt, :month) do
     %{ndt | month: month - 1}
   end
 
-  defp prev(ndt, precision) do
+  def prev_ndt(ndt, precision) do
     {count, unit} = precision_to_count_unit(precision)
     NaiveDateTime.add(ndt, -count, unit)
   end
@@ -178,8 +180,8 @@ defmodule CalendarInterval do
   """
   @spec next(t()) :: t()
   def next(%CalendarInterval{last: last, precision: precision}) do
-    first = next(last, {:microsecond, 6})
-    last = next(first, precision) |> prev({:microsecond, 6})
+    first = next_ndt(last, {:microsecond, 6})
+    last = next_ndt(first, precision) |> prev_ndt({:microsecond, 6})
     %CalendarInterval{first: first, last: last, precision: precision}
   end
 
@@ -197,8 +199,8 @@ defmodule CalendarInterval do
   """
   @spec prev(t()) :: t()
   def prev(%CalendarInterval{first: first, precision: precision}) do
-    first = prev(first, precision)
-    last = next(first, precision) |> prev({:microsecond, 6})
+    first = prev_ndt(first, precision)
+    last = next_ndt(first, precision) |> prev_ndt({:microsecond, 6})
     %CalendarInterval{first: first, last: last, precision: precision}
   end
 
@@ -209,6 +211,38 @@ defmodule CalendarInterval do
   defimpl Inspect do
     def inspect(interval, _) do
       "~I\"" <> CalendarInterval.to_string(interval) <> "\""
+    end
+  end
+
+  defimpl Enumerable do
+    def count(_), do: {:error, __MODULE__}
+
+    def member?(_, _), do: {:error, __MODULE__}
+
+    def slice(_), do: {:error, __MODULE__}
+
+    def reduce(interval, acc, fun) do
+      reduce(interval.first, interval.last, interval.precision, acc, fun)
+    end
+
+    defp reduce(_first, _last, _precision, {:halt, acc}, _fun) do
+      {:halted, acc}
+    end
+
+    defp reduce(_first, _last, _precision, {:suspend, acc}, _fun) do
+      {:suspended, acc}
+    end
+
+    defp reduce(first, last, precision, {:cont, acc}, fun) do
+      if NaiveDateTime.compare(first, last) == :lt do
+        next_first = CalendarInterval.next_ndt(first, precision)
+        current_last = CalendarInterval.prev_ndt(next_first, {:microsecond, 6})
+        interval = %CalendarInterval{first: first, last: current_last, precision: precision}
+
+        reduce(next_first, last, precision, fun.(interval, acc), fun)
+      else
+        {:halt, acc}
+      end
     end
   end
 end

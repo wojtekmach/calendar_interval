@@ -78,4 +78,20 @@ defmodule CalendarIntervalTest do
     assert i.first == ~N"2017-03-01 00:00:00.000000"
     assert i.last == ~N"2017-03-31 23:59:59.999999"
   end
+
+  test "enumerable" do
+    assert Enum.to_list(~I"2018") == [~I"2018"]
+    assert Enum.to_list(~I"2018/2019") == [~I"2018", ~I"2019"]
+
+    assert ~I"2018-06" in ~I"2018-01/12"
+    assert ~I"2019-01" not in ~I"2018-01/12"
+
+    # TODO:
+    # assert ~I"2018-01-01" in ~I"2018"
+    assert ~I"2019-01-01" not in ~I"2018"
+
+    assert Enum.count(~I"2018-01/12") == 12
+    assert Enum.count(~I"2018-01-01/12-31") == 365
+    assert Enum.count(~I"2016-01-01/12-31") == 366
+  end
 end
