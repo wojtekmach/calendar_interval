@@ -1,0 +1,2 @@
+defmodule CalendarInterval do
+end
