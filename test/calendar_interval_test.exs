@@ -23,4 +23,24 @@ defmodule CalendarIntervalTest do
     assert i.first == ~N"2018-06-15 10:20:30.123456"
     assert i.last == ~N"2018-06-15 10:20:30.123456"
   end
+
+  @table [
+    "2018",
+    "2018-01",
+    "2018-12",
+    "2018-01-01",
+    "2018-12-31 23",
+    "2018-12-31 23:59",
+    "2018-12-31 23:59:59",
+    "2018-12-31 23:59:59.000",
+    "2018-12-31 23:59:59.123",
+    "2018-12-31 23:59:59.999",
+    "2018-12-31 23:59:59.999999",
+  ]
+
+  for s <- @table do
+    test "to_string/1: #{s}" do
+      assert CalendarInterval.to_string(CalendarInterval.parse!(unquote(s))) == unquote(s)
+    end
+  end
 end
