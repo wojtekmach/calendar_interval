@@ -44,4 +44,18 @@ defmodule CalendarIntervalTest do
       assert CalendarInterval.to_string(CalendarInterval.parse!(unquote(s))) == unquote(s)
     end
   end
+
+  test "next/1" do
+    i = CalendarInterval.next(~I"2018-01")
+    assert i.precision == :month
+    assert i.first == ~N"2018-02-01 00:00:00.000000"
+    assert i.last == ~N"2018-02-28 23:59:59.999999"
+  end
+
+  test "prev/1" do
+    i = CalendarInterval.prev(~I"2018-01")
+    assert i.precision == :month
+    assert i.first == ~N"2017-12-01 00:00:00.000000"
+    assert i.last == ~N"2017-12-31 23:59:59.999999"
+  end
 end

@@ -129,6 +129,38 @@ defmodule CalendarInterval do
     end
   end
 
+  @doc """
+  Returns next interval.
+
+  ## Examples
+
+      iex> CalendarInterval.next(~I"2018-06-30")
+      ~I"2018-07-01"
+
+  """
+  @spec next(t()) :: t()
+  def next(%CalendarInterval{first: first, precision: precision}) do
+    first = next(first, precision)
+    last = next(first, precision) |> prev({:microsecond, 6})
+    %CalendarInterval{first: first, last: last, precision: precision}
+  end
+
+  @doc """
+  Returns previous interval.
+
+  ## Examples
+
+      iex> CalendarInterval.prev(~I"2018-06-01")
+      ~I"2018-05-31"
+
+  """
+  @spec prev(t()) :: t()
+  def prev(%CalendarInterval{first: first, precision: precision}) do
+    first = prev(first, precision)
+    last = next(first, precision) |> prev({:microsecond, 6})
+    %CalendarInterval{first: first, last: last, precision: precision}
+  end
+
   defimpl String.Chars do
     defdelegate to_string(interval), to: CalendarInterval
   end
