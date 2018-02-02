@@ -23,6 +23,11 @@ defmodule CalendarIntervalTest do
     assert i.precision == {:microsecond, 6}
     assert i.first == ~N"2018-06-15 10:20:30.123456"
     assert i.last == ~N"2018-06-15 10:20:30.123456"
+
+    i = CalendarInterval.parse!("2018-06-15/16")
+    assert i.precision == :day
+    assert i.first == ~N"2018-06-15 00:00:00.000000"
+    assert i.last == ~N"2018-06-16 23:59:59.999999"
   end
 
   @table [
@@ -37,6 +42,10 @@ defmodule CalendarIntervalTest do
     "2018-12-31 23:59:59.123",
     "2018-12-31 23:59:59.999",
     "2018-12-31 23:59:59.999999",
+    "2018/2019",
+    "2018-01/02",
+    "2018-01/2019-02",
+    "2018-12-31 23:00:00/59:59",
   ]
 
   for s <- @table do

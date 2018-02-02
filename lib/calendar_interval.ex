@@ -50,12 +50,24 @@ defmodule CalendarInterval do
       iex> CalendarInterval.parse!("2018-06-30")
       ~I"2018-06-30"
 
+      iex> CalendarInterval.parse!("2018-06-01/30")
+      ~I"2018-06-01/30"
+
   """
   @spec parse!(String.t()) :: t()
   def parse!(string) do
-    {ndt, precision} = do_parse!(string)
-    last = next(ndt, precision) |> prev({:microsecond, 6})
-    %CalendarInterval{first: ndt, last: last, precision: precision}
+    case String.split(string, "/", trim: true) do
+      [string] ->
+        {ndt, precision} = do_parse!(string)
+        last = next(ndt, precision) |> prev({:microsecond, 6})
+        %CalendarInterval{first: ndt, last: last, precision: precision}
+
+      [left, right] ->
+        right = String.slice(left, 0, byte_size(left) - byte_size(right)) <> right
+        right = parse!(right)
+        left = parse!(left)
+        %CalendarInterval{first: left.first, last: right.last, precision: left.precision}
+    end
   end
 
   for {precision, bytes, rest} <- @patterns do
@@ -116,15 +128,38 @@ defmodule CalendarInterval do
 
   """
   @spec to_string(t()) :: String.t()
-  def to_string(interval)
+  def to_string(%CalendarInterval{first: first, last: last, precision: precision}) do
+    left = format(first, precision)
+    right = format(last, precision)
 
-  def to_string(%CalendarInterval{first: first, last: _last, precision: {:microsecond, 6}}) do
-    NaiveDateTime.to_string(first)
+    if left == right do
+      left
+    else
+      format_left_right(left, right)
+    end
+  end
+
+  defp format_left_right(left, left) do
+    left
+  end
+
+  for i <- Enum.reverse([5, 8, 11, 14, 17, 20, 22, 23, 24, 25, 26]) do
+    defp format_left_right(<<left::unquote(i)-bytes>> <> left_rest, <<left::unquote(i)-bytes>> <> right_rest) do
+      left <> left_rest <> "/" <> right_rest
+    end
+  end
+
+  defp format_left_right(left, right) do
+    left <> "/" <> right
+  end
+
+  defp format(ndt, {:microsecond, 6}) do
+    NaiveDateTime.to_string(ndt)
   end
 
   for {precision, bytes, _} <- @patterns do
-    def to_string(%CalendarInterval{first: first, last: _last, precision: unquote(precision)}) do
-      NaiveDateTime.to_string(first)
+    defp format(ndt, unquote(precision)) do
+      NaiveDateTime.to_string(ndt)
       |> String.slice(0, unquote(bytes))
     end
   end
