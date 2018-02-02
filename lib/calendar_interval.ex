@@ -23,13 +23,32 @@ defmodule CalendarInterval do
     {{:microsecond, 5}, 25, "0"}
   ]
 
+  defmacro __using__(_) do
+    quote do
+      import CalendarInterval, only: [sigil_I: 2]
+    end
+  end
+
+  @doc """
+  Handles the `~I` for intervals.
+
+  ## Examples
+
+      iex> ~I"2018-06".precision
+      :month
+
+  """
+  defmacro sigil_I({:<<>>, _, [string]}, []) do
+    Macro.escape(parse!(string))
+  end
+
   @doc """
   Parses a string into an interval.
 
   ## Examples
 
       iex> CalendarInterval.parse!("2018-06-30")
-      %CalendarInterval{first: ~N[2018-06-30 00:00:00.000000], last: ~N[2018-06-30 23:59:59.999999], precision: :day}
+      ~I"2018-06-30"
 
   """
   @spec parse!(String.t()) :: t()
@@ -92,7 +111,7 @@ defmodule CalendarInterval do
 
   ## Examples
 
-      iex> CalendarInterval.to_string(CalendarInterval.parse!("2018-06"))
+      iex> CalendarInterval.to_string(~I"2018-06")
       "2018-06"
 
   """
@@ -107,6 +126,16 @@ defmodule CalendarInterval do
     def to_string(%CalendarInterval{first: first, last: _last, precision: unquote(precision)}) do
       NaiveDateTime.to_string(first)
       |> String.slice(0, unquote(bytes))
+    end
+  end
+
+  defimpl String.Chars do
+    defdelegate to_string(interval), to: CalendarInterval
+  end
+
+  defimpl Inspect do
+    def inspect(interval, _) do
+      "~I\"" <> CalendarInterval.to_string(interval) <> "\""
     end
   end
 end

@@ -1,5 +1,6 @@
 defmodule CalendarIntervalTest do
   use ExUnit.Case
+  use CalendarInterval
   doctest CalendarInterval
 
   test "parse!/1" do
