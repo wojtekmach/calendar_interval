@@ -172,10 +172,13 @@ defmodule CalendarInterval do
       iex> CalendarInterval.next(~I"2018-06-30")
       ~I"2018-07-01"
 
+      iex> CalendarInterval.next(~I"2018-01/06")
+      ~I"2018-07"
+
   """
   @spec next(t()) :: t()
-  def next(%CalendarInterval{first: first, precision: precision}) do
-    first = next(first, precision)
+  def next(%CalendarInterval{last: last, precision: precision}) do
+    first = next(last, {:microsecond, 6})
     last = next(first, precision) |> prev({:microsecond, 6})
     %CalendarInterval{first: first, last: last, precision: precision}
   end
@@ -187,6 +190,9 @@ defmodule CalendarInterval do
 
       iex> CalendarInterval.prev(~I"2018-06-01")
       ~I"2018-05-31"
+
+      iex> CalendarInterval.prev(~I"2018-09/12")
+      ~I"2018-08"
 
   """
   @spec prev(t()) :: t()
