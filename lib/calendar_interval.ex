@@ -1,4 +1,25 @@
 defmodule CalendarInterval do
+  @moduledoc """
+  Functions for working with calendar intervals.
+
+  ## Examples
+
+      use CalendarInterval
+
+      iex> ~I"2018-06".precision
+      :month
+
+      iex> CalendarInterval.next(~I"2018-12-31")
+      ~I"2019-01-01"
+
+      iex> CalendarInterval.nest(~I"2018-06-15", :minute)
+      ~I"2018-06-15 00:00/23:59"
+
+      iex> Enum.count(~I"2016-01-01/12-31")
+      366
+
+  """
+
   defstruct [:first, :last, :precision]
 
   @type t() :: %CalendarInterval{
@@ -207,12 +228,12 @@ defmodule CalendarInterval do
   end
 
   @doc """
-  Return interval with lower precision within given interval.
+  Returns an interval within given interval.
 
   ## Example
 
       iex> CalendarInterval.nest(~I"2018", :day)
-      ~I"2018-01-01/2018-12-31"
+      ~I"2018-01-01/12-31"
 
       iex> CalendarInterval.nest(~I"2018-06-15", :minute)
       ~I"2018-06-15 00:00/23:59"
@@ -231,7 +252,7 @@ defmodule CalendarInterval do
   end
 
   @doc """
-  Return interval with higher precision that encloses given interval.
+  Returns interval that encloses given interval.
 
   ## Example
 
