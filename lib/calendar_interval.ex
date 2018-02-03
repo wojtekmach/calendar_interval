@@ -30,7 +30,8 @@ defmodule CalendarInterval do
 
   @type precision() :: :year | :month | :day | :hour | :minute | :second | {:microsecond, 1..6}
 
-  @precisions [:year, :month, :day, :hour, :minute, :second] ++ for i <- 1..6, do: {:microsecond, i}
+  @precisions [:year, :month, :day, :hour, :minute, :second] ++
+                for(i <- 1..6, do: {:microsecond, i})
 
   @patterns [
     {:year, 4, "-01-01 00:00:00.000000"},
@@ -70,6 +71,7 @@ defmodule CalendarInterval do
     last = first |> next_ndt(precision) |> prev_ndt({:microsecond, 6})
     %CalendarInterval{first: first, last: last, precision: precision}
   end
+
   def new(%Date{} = date, precision) do
     {:ok, ndt} = NaiveDateTime.new(date, ~T"00:00:00")
     new(ndt, precision)
@@ -149,6 +151,7 @@ defmodule CalendarInterval do
   def next_ndt(%NaiveDateTime{year: year, month: 12} = ndt, :month) do
     %{ndt | year: year + 1, month: 1}
   end
+
   def next_ndt(%NaiveDateTime{month: month} = ndt, :month) do
     %{ndt | month: month + 1}
   end
@@ -159,11 +162,12 @@ defmodule CalendarInterval do
   end
 
   @doc false
-  def prev_ndt(ndt, :year), do: update_in(ndt.year, & &1 - 1)
+  def prev_ndt(ndt, :year), do: update_in(ndt.year, &(&1 - 1))
 
   def prev_ndt(%NaiveDateTime{year: year, month: 1} = ndt, :month) do
     %{ndt | year: year - 1, month: 12}
   end
+
   def prev_ndt(%NaiveDateTime{month: month} = ndt, :month) do
     %{ndt | month: month - 1}
   end
@@ -208,7 +212,10 @@ defmodule CalendarInterval do
   end
 
   for i <- Enum.reverse([5, 8, 11, 14, 17, 20, 22, 23, 24, 25, 26]) do
-    defp format_left_right(<<left::unquote(i)-bytes>> <> left_rest, <<left::unquote(i)-bytes>> <> right_rest) do
+    defp format_left_right(
+           <<left::unquote(i)-bytes>> <> left_rest,
+           <<left::unquote(i)-bytes>> <> right_rest
+         ) do
       left <> left_rest <> "/" <> right_rest
     end
   end
@@ -282,7 +289,8 @@ defmodule CalendarInterval do
     if precision_index(new_precision) > precision_index(old_precision) do
       %{interval | precision: new_precision}
     else
-      raise ArgumentError, "cannot nest from #{inspect(old_precision)} to #{inspect(new_precision)}"
+      raise ArgumentError,
+            "cannot nest from #{inspect(old_precision)} to #{inspect(new_precision)}"
     end
   end
 
@@ -303,7 +311,8 @@ defmodule CalendarInterval do
     if precision_index(new_precision) < precision_index(old_precision) do
       interval.first |> truncate(new_precision) |> new(new_precision)
     else
-      raise ArgumentError, "cannot enclose from #{inspect(old_precision)} to #{inspect(new_precision)}"
+      raise ArgumentError,
+            "cannot enclose from #{inspect(old_precision)} to #{inspect(new_precision)}"
     end
   end
 
@@ -337,14 +346,21 @@ defmodule CalendarInterval do
   defimpl Enumerable do
     def count(_), do: {:error, __MODULE__}
 
-    def member?(%{first: first, last: last}, %CalendarInterval{first: other_first, last: other_last}) do
+    def member?(%{first: first, last: last}, %CalendarInterval{
+          first: other_first,
+          last: other_last
+        }) do
       {:ok,
-       NaiveDateTime.compare(other_first, first) in [:eq, :gt] and NaiveDateTime.compare(other_last, last) in [:eq, :lt]}
+       NaiveDateTime.compare(other_first, first) in [:eq, :gt] and
+         NaiveDateTime.compare(other_last, last) in [:eq, :lt]}
     end
+
     def member?(%{first: first, last: last}, %NaiveDateTime{} = ndt) do
       {:ok,
-       NaiveDateTime.compare(ndt, first) in [:eq, :gt] and NaiveDateTime.compare(ndt, last) in [:eq, :lt]}
+       NaiveDateTime.compare(ndt, first) in [:eq, :gt] and
+         NaiveDateTime.compare(ndt, last) in [:eq, :lt]}
     end
+
     def member?(interval, %Date{} = date) do
       {:ok, ndt} = NaiveDateTime.new(date, ~T"00:00:00")
       member?(interval, ndt)
