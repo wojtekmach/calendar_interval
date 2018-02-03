@@ -7,7 +7,7 @@ defmodule CalendarInterval.MixProject do
     [
       app: :calendar_interval,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.4",
       start_permanent: Mix.env() == :prod,
       docs: docs(),
       deps: deps()

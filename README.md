@@ -1,5 +1,7 @@
 # CalendarInterval
 
+[![Build Status](https://travis-ci.org/wojtekmach/calendar_interval.svg?branch=master)](https://travis-ci.org/wojtekmach/calendar_interval)
+
 Functions for working with calendar intervals.
 
 ## Examples
