@@ -145,34 +145,32 @@ defmodule CalendarInterval do
     {NaiveDateTime.from_iso8601!(string), {:microsecond, 6}}
   end
 
-  @doc false
-  def next_ndt(ndt, :year), do: update_in(ndt.year, &(&1 + 1))
+  defp next_ndt(ndt, :year), do: update_in(ndt.year, &(&1 + 1))
 
-  def next_ndt(%NaiveDateTime{year: year, month: 12} = ndt, :month) do
+  defp next_ndt(%NaiveDateTime{year: year, month: 12} = ndt, :month) do
     %{ndt | year: year + 1, month: 1}
   end
 
-  def next_ndt(%NaiveDateTime{month: month} = ndt, :month) do
+  defp next_ndt(%NaiveDateTime{month: month} = ndt, :month) do
     %{ndt | month: month + 1}
   end
 
-  def next_ndt(ndt, precision) do
+  defp next_ndt(ndt, precision) do
     {count, unit} = precision_to_count_unit(precision)
     NaiveDateTime.add(ndt, count, unit)
   end
 
-  @doc false
-  def prev_ndt(ndt, :year), do: update_in(ndt.year, &(&1 - 1))
+  defp prev_ndt(ndt, :year), do: update_in(ndt.year, &(&1 - 1))
 
-  def prev_ndt(%NaiveDateTime{year: year, month: 1} = ndt, :month) do
+  defp prev_ndt(%NaiveDateTime{year: year, month: 1} = ndt, :month) do
     %{ndt | year: year - 1, month: 12}
   end
 
-  def prev_ndt(%NaiveDateTime{month: month} = ndt, :month) do
+  defp prev_ndt(%NaiveDateTime{month: month} = ndt, :month) do
     %{ndt | month: month - 1}
   end
 
-  def prev_ndt(ndt, precision) do
+  defp prev_ndt(ndt, precision) do
     {count, unit} = precision_to_count_unit(precision)
     NaiveDateTime.add(ndt, -count, unit)
   end
