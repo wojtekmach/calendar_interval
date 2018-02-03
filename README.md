@@ -1,21 +1,37 @@
 # CalendarInterval
 
-**TODO: Add description**
+Functions for working with calendar intervals.
+
+See [`lib/calendar_interval.ex`](lib/calendar_stream.ex).
+
+## Examples
+
+    use CalendarInterval
+
+    iex> ~I"2018-06".precision
+    :month
+
+    iex> CalendarInterval.next(~I"2018-12-31")
+    ~I"2019-01-01"
+
+    iex> CalendarInterval.nest(~I"2018-06-15", :minute)
+    ~I"2018-06-15 00:00/23:59"
+
+    iex> Enum.count(~I"2016-01-01/12-31")
+    366
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `calendar_interval` to your list of dependencies in `mix.exs`:
+Add to `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:calendar_interval, "~> 0.1.0"}
+    {:calendar_interval, github: "wojtekmach/calendar_interval"
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/calendar_interval](https://hexdocs.pm/calendar_interval).
+## License
 
+[Apache 2.0](./LICENSE.md)
