@@ -230,6 +230,42 @@ defmodule CalendarInterval do
     end
   end
 
+  @doc """
+  Return interval with higher precision that encloses given interval.
+
+  ## Example
+
+      iex> CalendarInterval.enclosing(~I"2018-05-01", :year)
+      ~I"2018"
+
+      iex> CalendarInterval.enclosing(~I"2018-06-15", :second)
+      ** (ArgumentError) cannot enclose from :day to :second
+
+  """
+  @spec enclosing(t(), precision()) :: t()
+  def enclosing(%CalendarInterval{precision: old_precision} = interval, new_precision) do
+    if precision_index(new_precision) < precision_index(old_precision) do
+      first = truncate(interval.first, new_precision)
+      last = next_ndt(first, new_precision) |> prev_ndt({:microsecond, 6})
+      # IO.inspect {first, last, new_precision}
+      %CalendarInterval{first: first, last: last, precision: new_precision}
+    else
+      raise ArgumentError, "cannot enclose from #{inspect(old_precision)} to #{inspect(new_precision)}"
+    end
+  end
+
+  defp truncate(ndt, :year), do: truncate(%{ndt | month: 1}, :month)
+  defp truncate(ndt, :month), do: truncate(%{ndt | day: 1}, :day)
+  defp truncate(ndt, :day), do: %{ndt | hour: 0, minute: 0, second: 0, microsecond: {0, 6}}
+  defp truncate(ndt, :hour), do: %{ndt | minute: 0, second: 0, microsecond: {0, 6}}
+  defp truncate(ndt, :minute), do: %{ndt | second: 0, microsecond: {0, 6}}
+  defp truncate(ndt, :second), do: %{ndt | microsecond: {0, 6}}
+
+  defp truncate(%{microsecond: {microsecond, _}} = ndt, {:microsecond, precision}) do
+    {1, n} = precision_to_count_unit({:microsecond, precision})
+    %{ndt | microsecond: {div(microsecond, n) * n, 6}}
+  end
+
   for {precision, index} <- Enum.with_index(@precisions) do
     defp precision_index(unquote(precision)), do: unquote(index)
   end

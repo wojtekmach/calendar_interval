@@ -79,6 +79,34 @@ defmodule CalendarIntervalTest do
     assert i.last == ~N"2017-03-31 23:59:59.999999"
   end
 
+  test "enclosing/1" do
+    interval = ~I"2018-02-03 10:20:30.123456"
+
+    i = CalendarInterval.enclosing(interval, {:microsecond, 3})
+    assert i.first == ~N"2018-02-03 10:20:30.123000"
+    assert i.last == ~N"2018-02-03 10:20:30.123999"
+
+    i = CalendarInterval.enclosing(interval, :second)
+    assert i.first == ~N"2018-02-03 10:20:30.000000"
+    assert i.last == ~N"2018-02-03 10:20:30.999999"
+
+    i = CalendarInterval.enclosing(interval, :minute)
+    assert i.first == ~N"2018-02-03 10:20:00.000000"
+    assert i.last == ~N"2018-02-03 10:20:59.999999"
+
+    i = CalendarInterval.enclosing(interval, :hour)
+    assert i.first == ~N"2018-02-03 10:00:00.000000"
+    assert i.last == ~N"2018-02-03 10:59:59.999999"
+
+    i = CalendarInterval.enclosing(interval, :day)
+    assert i.first == ~N"2018-02-03 00:00:00.000000"
+    assert i.last == ~N"2018-02-03 23:59:59.999999"
+
+    i = CalendarInterval.enclosing(interval, :month)
+    assert i.first == ~N"2018-02-01 00:00:00.000000"
+    assert i.last == ~N"2018-02-28 23:59:59.999999"
+  end
+
   test "enumerable" do
     assert Enum.to_list(~I"2018") == [~I"2018"]
     assert Enum.to_list(~I"2018/2019") == [~I"2018", ~I"2019"]
