@@ -112,18 +112,18 @@ defmodule CalendarIntervalTest do
     assert Enum.to_list(~I"2018/2019") == [~I"2018", ~I"2019"]
 
     assert ~I"2018-06" in ~I"2018-01/12"
-    assert ~I"2019-01" not in ~I"2018-01/12"
+    assert not(~I"2019-01" in ~I"2018-01/12")
 
     assert ~I"2018-01-01" in ~I"2018"
     assert ~I"2018-04-01" in ~I"2018-03/05"
-    assert ~I"2019-01-01" not in ~I"2018"
+    assert not(~I"2019-01-01" in ~I"2018")
 
     assert ~N"2018-01-01 09:00:00" in ~I"2018"
     assert ~N"2018-12-31 23:59:59" in ~I"2018"
-    assert ~N"2019-01-01 01:01:01" not in ~I"2018"
+    assert not(~N"2019-01-01 01:01:01" in ~I"2018")
 
     assert ~D"2018-01-01" in ~I"2018"
-    assert ~D"2019-01-01" not in ~I"2018"
+    assert not(~D"2019-01-01" in ~I"2018")
 
     assert Enum.count(~I"2018-01/12") == 12
     assert Enum.count(~I"2018-01-01/12-31") == 365
