@@ -94,6 +94,9 @@ defmodule CalendarIntervalTest do
     assert ~N"2018-12-31 23:59:59" in ~I"2018"
     assert ~N"2019-01-01 01:01:01" not in ~I"2018"
 
+    assert ~D"2018-01-01" in ~I"2018"
+    assert ~D"2019-01-01" not in ~I"2018"
+
     assert Enum.count(~I"2018-01/12") == 12
     assert Enum.count(~I"2018-01-01/12-31") == 365
     assert Enum.count(~I"2016-01-01/12-31") == 366
