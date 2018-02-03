@@ -9,6 +9,8 @@ defmodule CalendarInterval do
 
   @type precision() :: :year | :month | :day | :hour | :minute | :second | {:microsecond, 1..6}
 
+  @precisions [:year, :month, :day, :hour, :minute, :second] ++ for i <- 1..6, do: {:microsecond, i}
+
   @patterns [
     {:year, 4, "-01-01 00:00:00.000000"},
     {:month, 7, "-01 00:00:00.000000"},
@@ -202,6 +204,34 @@ defmodule CalendarInterval do
     first = prev_ndt(first, precision)
     last = next_ndt(first, precision) |> prev_ndt({:microsecond, 6})
     %CalendarInterval{first: first, last: last, precision: precision}
+  end
+
+  @doc """
+  Return interval with lower precision within given interval.
+
+  ## Example
+
+      iex> CalendarInterval.nest(~I"2018", :day)
+      ~I"2018-01-01/2018-12-31"
+
+      iex> CalendarInterval.nest(~I"2018-06-15", :minute)
+      ~I"2018-06-15 00:00/23:59"
+
+      iex> CalendarInterval.nest(~I"2018-06-15", :year)
+      ** (ArgumentError) cannot nest from :day to :year
+
+  """
+  @spec nest(t(), precision()) :: t()
+  def nest(%CalendarInterval{precision: old_precision} = interval, new_precision) do
+    if precision_index(new_precision) > precision_index(old_precision) do
+      %{interval | precision: new_precision}
+    else
+      raise ArgumentError, "cannot nest from #{inspect(old_precision)} to #{inspect(new_precision)}"
+    end
+  end
+
+  for {precision, index} <- Enum.with_index(@precisions) do
+    defp precision_index(unquote(precision)), do: unquote(index)
   end
 
   defimpl String.Chars do
