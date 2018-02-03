@@ -95,7 +95,7 @@ defmodule CalendarInterval do
   end
 
   @doc """
-  Handles the `~I` for intervals.
+  Handles the `~I` sigil for intervals.
 
   ## Examples
 
