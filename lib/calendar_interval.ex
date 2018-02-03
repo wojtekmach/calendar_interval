@@ -53,6 +53,29 @@ defmodule CalendarInterval do
   end
 
   @doc """
+  Returns an interval starting at given date truncated to `precision`.
+
+  ## Examples
+
+      iex> CalendarInterval.new(~N"2018-06-15 10:20:30.134", :minute)
+      ~I"2018-06-15 10:20"
+
+      iex> CalendarInterval.new(~D"2018-06-15", :minute)
+      ~I"2018-06-15 00:00"
+
+  """
+  @spec new(NaiveDateTime.t() | Date.t(), precision()) :: t()
+  def new(%NaiveDateTime{} = naive_datetime, precision) do
+    first = truncate(naive_datetime, precision)
+    last = first |> next_ndt(precision) |> prev_ndt({:microsecond, 6})
+    %CalendarInterval{first: first, last: last, precision: precision}
+  end
+  def new(%Date{} = date, precision) do
+    {:ok, ndt} = NaiveDateTime.new(date, ~T"00:00:00")
+    new(ndt, precision)
+  end
+
+  @doc """
   Returns an interval for the current UTC time in given `precision`.
 
   ## Examples
@@ -99,8 +122,7 @@ defmodule CalendarInterval do
     case String.split(string, "/", trim: true) do
       [string] ->
         {ndt, precision} = do_parse!(string)
-        last = next_ndt(ndt, precision) |> prev_ndt({:microsecond, 6})
-        %CalendarInterval{first: ndt, last: last, precision: precision}
+        new(ndt, precision)
 
       [left, right] ->
         right = String.slice(left, 0, byte_size(left) - byte_size(right)) <> right
@@ -220,9 +242,7 @@ defmodule CalendarInterval do
   """
   @spec next(t()) :: t()
   def next(%CalendarInterval{last: last, precision: precision}) do
-    first = next_ndt(last, {:microsecond, 6})
-    last = next_ndt(first, precision) |> prev_ndt({:microsecond, 6})
-    %CalendarInterval{first: first, last: last, precision: precision}
+    last |> next_ndt({:microsecond, 6}) |> new(precision)
   end
 
   @doc """
@@ -239,9 +259,7 @@ defmodule CalendarInterval do
   """
   @spec prev(t()) :: t()
   def prev(%CalendarInterval{first: first, precision: precision}) do
-    first = prev_ndt(first, precision)
-    last = next_ndt(first, precision) |> prev_ndt({:microsecond, 6})
-    %CalendarInterval{first: first, last: last, precision: precision}
+    first |> prev_ndt(precision) |> new(precision)
   end
 
   @doc """
@@ -283,10 +301,7 @@ defmodule CalendarInterval do
   @spec enclosing(t(), precision()) :: t()
   def enclosing(%CalendarInterval{precision: old_precision} = interval, new_precision) do
     if precision_index(new_precision) < precision_index(old_precision) do
-      first = truncate(interval.first, new_precision)
-      last = next_ndt(first, new_precision) |> prev_ndt({:microsecond, 6})
-      # IO.inspect {first, last, new_precision}
-      %CalendarInterval{first: first, last: last, precision: new_precision}
+      interval.first |> truncate(new_precision) |> new(new_precision)
     else
       raise ArgumentError, "cannot enclose from #{inspect(old_precision)} to #{inspect(new_precision)}"
     end
@@ -338,24 +353,22 @@ defmodule CalendarInterval do
     def slice(_), do: {:error, __MODULE__}
 
     def reduce(interval, acc, fun) do
-      reduce(interval.first, interval.last, interval.precision, acc, fun)
+      current = CalendarInterval.new(interval.first, interval.precision)
+      reduce(current, interval.last, interval.precision, acc, fun)
     end
 
-    defp reduce(_first, _last, _precision, {:halt, acc}, _fun) do
+    defp reduce(_current_interval, _last, _precision, {:halt, acc}, _fun) do
       {:halted, acc}
     end
 
-    defp reduce(_first, _last, _precision, {:suspend, acc}, _fun) do
+    defp reduce(_current_interval, _last, _precision, {:suspend, acc}, _fun) do
       {:suspended, acc}
     end
 
-    defp reduce(first, last, precision, {:cont, acc}, fun) do
-      if NaiveDateTime.compare(first, last) == :lt do
-        next_first = CalendarInterval.next_ndt(first, precision)
-        current_last = CalendarInterval.prev_ndt(next_first, {:microsecond, 6})
-        interval = %CalendarInterval{first: first, last: current_last, precision: precision}
-
-        reduce(next_first, last, precision, fun.(interval, acc), fun)
+    defp reduce(current_interval, last, precision, {:cont, acc}, fun) do
+      if NaiveDateTime.compare(current_interval.first, last) == :lt do
+        next = CalendarInterval.next(current_interval)
+        reduce(next, last, precision, fun.(current_interval, acc), fun)
       else
         {:halt, acc}
       end
