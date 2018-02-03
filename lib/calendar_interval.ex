@@ -360,6 +360,33 @@ defmodule CalendarInterval do
     end
   end
 
+  @doc """
+  Returns an union of `interval1` and `interval2` or `nil`.
+
+  Both intervals must have the same `precision`.
+
+  ## Examples
+
+      iex> CalendarInterval.union(~I"2018-01/02", ~I"2018-01/04")
+      ~I"2018-01/04"
+      iex> CalendarInterval.union(~I"2018-01/11", ~I"2018-12")
+      ~I"2018-01/12"
+
+      iex> CalendarInterval.union(~I"2018-01/02", ~I"2018-04/05")
+      nil
+
+  """
+  @spec union(t(), t()) :: t() | nil
+  def union(interval1, interval2)
+
+  def union(%CalendarInterval{precision: p} = i1, %CalendarInterval{precision: p} = i2) do
+    if intersection(i1, i2) != nil or next_ndt(i1.last, {:microsecond, 6}) == i2.first do
+      %CalendarInterval{first: i1.first, last: i2.last, precision: p}
+    else
+      nil
+    end
+  end
+
   defp lteq?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) in [:lt, :eq]
 
   defp gteq?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) in [:gt, :eq]
