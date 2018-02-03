@@ -221,6 +221,10 @@ defmodule CalendarInterval do
       {:ok,
        NaiveDateTime.compare(other_first, first) in [:eq, :gt] and NaiveDateTime.compare(other_last, last) in [:eq, :lt]}
     end
+    def member?(%{first: first, last: last}, %NaiveDateTime{} = ndt) do
+      {:ok,
+       NaiveDateTime.compare(ndt, first) in [:eq, :gt] and NaiveDateTime.compare(ndt, last) in [:eq, :lt]}
+    end
 
     def slice(_), do: {:error, __MODULE__}
 
