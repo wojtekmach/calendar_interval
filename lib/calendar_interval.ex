@@ -217,7 +217,10 @@ defmodule CalendarInterval do
   defimpl Enumerable do
     def count(_), do: {:error, __MODULE__}
 
-    def member?(_, _), do: {:error, __MODULE__}
+    def member?(%{first: first, last: last}, %CalendarInterval{first: other_first, last: other_last}) do
+      {:ok,
+       NaiveDateTime.compare(other_first, first) in [:eq, :gt] and NaiveDateTime.compare(other_last, last) in [:eq, :lt]}
+    end
 
     def slice(_), do: {:error, __MODULE__}
 
