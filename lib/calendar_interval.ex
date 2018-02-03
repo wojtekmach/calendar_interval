@@ -333,6 +333,43 @@ defmodule CalendarInterval do
     defp precision_index(unquote(precision)), do: unquote(index)
   end
 
+  @doc """
+  Returns an intersection of `interval1` and `interval2` or `nil` if they don't overlap.
+
+  Both intervals must have the same `precision`.
+
+  ## Examples
+
+      iex> CalendarInterval.intersection(~I"2018-01/04", ~I"2018-03/06")
+      ~I"2018-03/04"
+      iex> CalendarInterval.intersection(~I"2018-01/12", ~I"2018-02")
+      ~I"2018-02"
+
+      iex> CalendarInterval.intersection(~I"2018-01/02", ~I"2018-11/12")
+      nil
+
+  """
+  @spec intersection(t(), t()) :: t() | nil
+  def intersection(interval1, interval2)
+
+  def intersection(%CalendarInterval{precision: p} = i1, %CalendarInterval{precision: p} = i2) do
+    if lteq?(i1.first, i2.last) and gteq?(i1.last, i2.first) do
+      first = max_ndt(i1.first, i2.first)
+      last = min_ndt(i1.last, i2.last)
+      %CalendarInterval{first: first, last: last, precision: p}
+    else
+      nil
+    end
+  end
+
+  defp lteq?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) in [:lt, :eq]
+
+  defp gteq?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) in [:gt, :eq]
+
+  defp min_ndt(ndt1, ndt2), do: if lteq?(ndt1, ndt2), do: ndt1, else: ndt2
+
+  defp max_ndt(ndt1, ndt2), do: if gteq?(ndt1, ndt2), do: ndt1, else: ndt2
+
   defimpl String.Chars do
     defdelegate to_string(interval), to: CalendarInterval
   end
