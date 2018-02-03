@@ -53,6 +53,23 @@ defmodule CalendarInterval do
   end
 
   @doc """
+  Returns an interval for the current UTC time in given `precision`.
+
+  ## Examples
+
+      iex> CalendarInterval.utc_now(:month) in ~I"2018/2100"
+      true
+
+  """
+  @spec utc_now(precision()) :: t()
+  def utc_now(precision \\ {:microsecond, 6}) do
+    now = NaiveDateTime.utc_now()
+    first = truncate(now, precision)
+    last = next_ndt(first, precision) |> prev_ndt({:microsecond, 6})
+    %CalendarInterval{first: first, last: last, precision: precision}
+  end
+
+  @doc """
   Handles the `~I` for intervals.
 
   ## Examples
