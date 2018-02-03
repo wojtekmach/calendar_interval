@@ -361,6 +361,62 @@ defmodule CalendarInterval do
   end
 
   @doc """
+  Splits interval by another interval.
+
+  ## Examples
+
+      iex> CalendarInterval.split(~I"2018-01/12", ~I"2018-04/05")
+      {~I"2018-01/03", ~I"2018-04/05", ~I"2018-06/12"}
+
+      iex> CalendarInterval.split(~I"2018-01/12", ~I"2018-01/02")
+      {~I"2018-01/02", ~I"2018-03/12"}
+
+      iex> CalendarInterval.split(~I"2018-01/12", ~I"2018-08/12")
+      {~I"2018-01/07", ~I"2018-08/12"}
+
+      iex> CalendarInterval.split(~I"2018-01/12", ~I"2019-01")
+      ~I"2018-01/12"
+
+  """
+  @spec split(t(), t()) :: t() | {t(), t()} | {t(), t(), t()}
+  def split(%{precision: p} = interval1, %{precision: p} = interval2) do
+    if intersection(interval1, interval2) do
+      case {interval1.first == interval2.first, interval1.last == interval2.last} do
+        #  AABBCC
+        #    XX
+        #  AA BB CC
+        {false, false} ->
+          a = i(interval1.first, prev(interval2).last, p)
+          b = i(interval2.first, interval2.last, p)
+          c = i(next(interval2).first, interval1.last, p)
+          {a, b, c}
+
+        #  AABBCC
+        #  XX
+        #  AA BBCC
+        {true, false} ->
+          a = i(interval1.first, interval2.last, p)
+          b = i(next(interval2).first, interval1.last, p)
+          {a, b}
+
+        #  AABBCC
+        #      XX
+        #  AABB CC
+        {false, true} ->
+          a = i(interval1.first, prev(interval2).last, p)
+          b = i(interval2.first, interval2.last, p)
+          {a, b}
+      end
+    else
+      interval1
+    end
+  end
+
+  defp i(first, last, precision) do
+    %CalendarInterval{first: first, last: last, precision: precision}
+  end
+
+  @doc """
   Returns an union of `interval1` and `interval2` or `nil`.
 
   Both intervals must have the same `precision`.
@@ -391,9 +447,9 @@ defmodule CalendarInterval do
 
   defp gteq?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) in [:gt, :eq]
 
-  defp min_ndt(ndt1, ndt2), do: if lteq?(ndt1, ndt2), do: ndt1, else: ndt2
+  defp min_ndt(ndt1, ndt2), do: if(lteq?(ndt1, ndt2), do: ndt1, else: ndt2)
 
-  defp max_ndt(ndt1, ndt2), do: if gteq?(ndt1, ndt2), do: ndt1, else: ndt2
+  defp max_ndt(ndt1, ndt2), do: if(gteq?(ndt1, ndt2), do: ndt1, else: ndt2)
 
   defimpl String.Chars do
     defdelegate to_string(interval), to: CalendarInterval
