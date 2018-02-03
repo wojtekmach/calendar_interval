@@ -281,9 +281,10 @@ defmodule CalendarInterval do
   defp truncate(ndt, :hour), do: %{ndt | minute: 0, second: 0, microsecond: {0, 6}}
   defp truncate(ndt, :minute), do: %{ndt | second: 0, microsecond: {0, 6}}
   defp truncate(ndt, :second), do: %{ndt | microsecond: {0, 6}}
+  defp truncate(ndt, {:microsecond, 6}), do: ndt
 
   defp truncate(%{microsecond: {microsecond, _}} = ndt, {:microsecond, precision}) do
-    {1, n} = precision_to_count_unit({:microsecond, precision})
+    {1, n} = precision_to_count_unit({:microsecond, 6 - precision})
     %{ndt | microsecond: {div(microsecond, n) * n, 6}}
   end
 
