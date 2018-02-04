@@ -2,6 +2,11 @@ defmodule CalendarInterval do
   @moduledoc """
   Functions for working with calendar intervals.
 
+  * Text representation functions: `parse!/1`, `to_string/1`, `sigil_I/2`
+  * "Countable Time" [1] operations: `enclosing/2`, `nest/2`, `next/1`, `prev/1`
+  * Set-like operations: `intersection/2`, `union/2`
+  * Other functions: `new/2`, `utc_now/1`, `split/2`
+
   ## Examples
 
       use CalendarInterval
@@ -17,6 +22,13 @@ defmodule CalendarInterval do
 
       iex> Enum.count(~I"2016-01-01/12-31")
       366
+
+  ## References
+
+  This library is inspired by "Exploring Time" talk by Eric Evans [1] where
+  he mentioned the concept of "Countable Time".
+
+  [1] <https://www.youtube.com/watch?v=Zm95cYAtAa8>
 
   """
 
@@ -370,7 +382,6 @@ defmodule CalendarInterval do
 
       iex> CalendarInterval.split(~I"2018-01/12", ~I"2018-01/02")
       {~I"2018-01/02", ~I"2018-03/12"}
-
       iex> CalendarInterval.split(~I"2018-01/12", ~I"2018-08/12")
       {~I"2018-01/07", ~I"2018-08/12"}
 
