@@ -170,15 +170,19 @@ defmodule CalendarInterval do
 
   """
   @spec new(NaiveDateTime.t() | Date.t(), precision()) :: t()
-  def new(%NaiveDateTime{} = naive_datetime, precision) do
+  def new(%NaiveDateTime{} = naive_datetime, precision) when precision in @precisions do
     first = truncate(naive_datetime, precision)
     last = first |> next_ndt(precision, 1) |> prev_ndt({:microsecond, 6}, 1)
-    %CalendarInterval{first: first, last: last, precision: precision}
+    new(first, last, precision)
   end
 
-  def new(%Date{} = date, precision) do
+  def new(%Date{} = date, precision) when precision in @precisions do
     {:ok, ndt} = NaiveDateTime.new(date, ~T"00:00:00")
     new(ndt, precision)
+  end
+
+  defp new(%NaiveDateTime{} = first, %NaiveDateTime{} = last, precision) when precision in @precisions do
+    %CalendarInterval{first: first, last: last, precision: precision}
   end
 
   @doc """
@@ -195,7 +199,7 @@ defmodule CalendarInterval do
     now = NaiveDateTime.utc_now()
     first = truncate(now, precision)
     last = next_ndt(first, precision, 1) |> prev_ndt({:microsecond, 6}, 1)
-    %CalendarInterval{first: first, last: last, precision: precision}
+    new(first, last, precision)
   end
 
   @doc """
@@ -234,7 +238,7 @@ defmodule CalendarInterval do
         right = String.slice(left, 0, byte_size(left) - byte_size(right)) <> right
         right = parse!(right)
         left = parse!(left)
-        %CalendarInterval{first: left.first, last: right.last, precision: left.precision}
+        new(left.first, right.last, left.precision)
     end
   end
 
@@ -483,7 +487,7 @@ defmodule CalendarInterval do
     if lteq?(i1.first, i2.last) and gteq?(i1.last, i2.first) do
       first = max_ndt(i1.first, i2.first)
       last = min_ndt(i1.last, i2.last)
-      %CalendarInterval{first: first, last: last, precision: p}
+      new(first, last, p)
     else
       nil
     end
@@ -510,28 +514,24 @@ defmodule CalendarInterval do
   def split(%{precision: p} = interval1, %{precision: p} = interval2) do
     case relation(interval2, interval1) do
       :during ->
-        a = i(interval1.first, prev(interval2).last, p)
-        b = i(interval2.first, interval2.last, p)
-        c = i(next(interval2).first, interval1.last, p)
+        a = new(interval1.first, prev(interval2).last, p)
+        b = new(interval2.first, interval2.last, p)
+        c = new(next(interval2).first, interval1.last, p)
         {a, b, c}
 
       :starts ->
-        a = i(interval1.first, interval2.last, p)
-        b = i(next(interval2).first, interval1.last, p)
+        a = new(interval1.first, interval2.last, p)
+        b = new(next(interval2).first, interval1.last, p)
         {a, b}
 
       :finishes ->
-        a = i(interval1.first, prev(interval2).last, p)
-        b = i(interval2.first, interval2.last, p)
+        a = new(interval1.first, prev(interval2).last, p)
+        b = new(interval2.first, interval2.last, p)
         {a, b}
 
       _ ->
         interval1
     end
-  end
-
-  defp i(first, last, precision) do
-    %CalendarInterval{first: first, last: last, precision: precision}
   end
 
   @doc """
@@ -555,7 +555,7 @@ defmodule CalendarInterval do
 
   def union(%CalendarInterval{precision: p} = i1, %CalendarInterval{precision: p} = i2) do
     if intersection(i1, i2) != nil or next_ndt(i1.last, {:microsecond, 6}, 1) == i2.first do
-      %CalendarInterval{first: i1.first, last: i2.last, precision: p}
+      new(i1.first, i2.last, p)
     else
       nil
     end
