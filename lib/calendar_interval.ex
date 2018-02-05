@@ -288,6 +288,16 @@ defmodule CalendarInterval do
     {1, Enum.reduce(1..exponent, 1, fn _, acc -> acc * 10 end)}
   end
 
+  @doc false
+  def count(%CalendarInterval{first: %{year: year1}, last: %{year: year2}, precision: :year}),
+    do: year2 - year1 + 1
+  def count(%CalendarInterval{first: %{year: year1, month: month1}, last: %{year: year2, month: month2}, precision: :month}),
+    do: month2 + (year2 * 12) - month1 - (year1 * 12) + 1
+  def count(%CalendarInterval{first: first, last: last, precision: precision}) do
+    {count, unit} = precision_to_count_unit(precision)
+    div(NaiveDateTime.diff(last, first, unit), count) + 1
+  end
+
   @doc """
   Returns string representation.
 
@@ -620,7 +630,9 @@ defmodule CalendarInterval do
   end
 
   defimpl Enumerable do
-    def count(_), do: {:error, __MODULE__}
+    def count(interval) do
+      {:ok, CalendarInterval.count(interval)}
+    end
 
     def member?(%{first: first, last: last}, %CalendarInterval{
           first: other_first,
