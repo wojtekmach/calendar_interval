@@ -8,7 +8,7 @@
     <title>CalendarInterval – calendar_interval v0.1.0-dev</title>
     <link rel="stylesheet" href="dist/app-81d381dea4.css" />
     
-    <script src="dist/sidebar_items-a22a45d951.js"></script>
+    <script src="dist/sidebar_items-e5c3719f1a.js"></script>
     
     
     
@@ -89,9 +89,9 @@
 </li>
 <li>Set-like operations: <a href="#intersection/2"><code class="inline">intersection/2</code></a>, <a href="#union/2"><code class="inline">union/2</code></a>
 </li>
-<li>Other functions: <a href="#new/2"><code class="inline">new/2</code></a>, <a href="#utc_now/1"><code class="inline">utc_now/1</code></a>, <a href="#split/2"><code class="inline">split/2</code></a>
-</li>
 <li>Allen’s Interval Algebra: <a href="#relation/2"><code class="inline">relation/2</code></a> (replacement for <code class="inline">==</code>, <code class="inline">&gt;=</code> etc)
+</li>
+<li>Other functions: <a href="#new/2"><code class="inline">new/2</code></a>, <a href="#utc_now/1"><code class="inline">utc_now/1</code></a>, <a href="#split/2"><code class="inline">split/2</code></a>
 </li>
 </ul>
 <h2 id="module-examples" class="section-heading">
@@ -215,7 +215,7 @@ he mentioned the concept of “Countable Time” and introduced me to
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#next/1">next(calendar_interval)</a>
+    <a href="#next/2">next(calendar_interval, step \\ 1)</a>
   </div>
   
     <div class="summary-synopsis"><p>Returns next interval</p>
@@ -233,7 +233,7 @@ he mentioned the concept of “Countable Time” and introduced me to
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#prev/1">prev(calendar_interval)</a>
+    <a href="#prev/2">prev(calendar_interval, step \\ 1)</a>
   </div>
   
     <div class="summary-synopsis"><p>Returns previous interval</p>
@@ -504,7 +504,7 @@ a preceded by b   |       aaaa
     </a>
     <span class="signature">enclosing(interval, new_precision)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L412" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L449" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -543,7 +543,7 @@ iex&gt; CalendarInterval.enclosing(~I&quot;2018-06-15&quot;, :second)
     </a>
     <span class="signature">intersection(interval1, interval2)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L457" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L495" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -585,7 +585,7 @@ nil</code></pre>
     </a>
     <span class="signature">nest(interval, new_precision)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L390" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L426" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -656,17 +656,19 @@ iex&gt; CalendarInterval.new(~D&quot;2018-06-15&quot;, :minute)
 
   </section>
 </div>
-<div class="detail" id="next/1">
+<div class="detail" id="next/2">
   
+  
+    <span id="next/1"></span>
   
   <div class="detail-header">
-    <a href="#next/1" class="detail-link" title="Link to this function">
+    <a href="#next/2" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">next(calendar_interval)</span>
+    <span class="signature">next(calendar_interval, step \\ 1)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L353" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L380" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -675,20 +677,22 @@ iex&gt; CalendarInterval.new(~D&quot;2018-06-15&quot;, :minute)
     
       <div class="specs">
         
-          <pre>next(<a href="#t:t/0">t</a>()) :: <a href="#t:t/0">t</a>()</pre>
+          <pre>next(<a href="#t:t/0">t</a>(), step :: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()) :: <a href="#t:t/0">t</a>()</pre>
         
       </div>
     
   </div>
   <section class="docstring">
     <p>Returns next interval.</p>
-<h2 id="next/1-examples" class="section-heading">
-  <a href="#next/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+<h2 id="next/2-examples" class="section-heading">
+  <a href="#next/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   Examples
 </h2>
 
 <pre><code class="iex elixir">iex&gt; CalendarInterval.next(~I&quot;2018-06-30&quot;)
 ~I&quot;2018-07-01&quot;
+iex&gt; CalendarInterval.next(~I&quot;2018-06-30 09:00&quot;, 80)
+~I&quot;2018-06-30 10:20&quot;
 
 iex&gt; CalendarInterval.next(~I&quot;2018-01/06&quot;)
 ~I&quot;2018-07&quot;</code></pre>
@@ -705,7 +709,7 @@ iex&gt; CalendarInterval.next(~I&quot;2018-01/06&quot;)
     </a>
     <span class="signature">parse!(string)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L227" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L232" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -734,17 +738,19 @@ iex&gt; CalendarInterval.parse!(&quot;2018-06-01/30&quot;)
 
   </section>
 </div>
-<div class="detail" id="prev/1">
+<div class="detail" id="prev/2">
   
+  
+    <span id="prev/1"></span>
   
   <div class="detail-header">
-    <a href="#prev/1" class="detail-link" title="Link to this function">
+    <a href="#prev/2" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">prev(calendar_interval)</span>
+    <span class="signature">prev(calendar_interval, step \\ 1)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L370" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L403" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -753,20 +759,22 @@ iex&gt; CalendarInterval.parse!(&quot;2018-06-01/30&quot;)
     
       <div class="specs">
         
-          <pre>prev(<a href="#t:t/0">t</a>()) :: <a href="#t:t/0">t</a>()</pre>
+          <pre>prev(<a href="#t:t/0">t</a>(), step :: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()) :: <a href="#t:t/0">t</a>()</pre>
         
       </div>
     
   </div>
   <section class="docstring">
     <p>Returns previous interval.</p>
-<h2 id="prev/1-examples" class="section-heading">
-  <a href="#prev/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+<h2 id="prev/2-examples" class="section-heading">
+  <a href="#prev/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   Examples
 </h2>
 
 <pre><code class="iex elixir">iex&gt; CalendarInterval.prev(~I&quot;2018-06-01&quot;)
 ~I&quot;2018-05-31&quot;
+iex&gt; CalendarInterval.prev(~I&quot;2018-06-01 01:00&quot;, 80)
+~I&quot;2018-05-31 23:40&quot;
 
 iex&gt; CalendarInterval.prev(~I&quot;2018-09/12&quot;)
 ~I&quot;2018-08&quot;</code></pre>
@@ -783,7 +791,7 @@ iex&gt; CalendarInterval.prev(~I&quot;2018-09/12&quot;)
     </a>
     <span class="signature">relation(interval1, interval2)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L567" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L601" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -825,7 +833,7 @@ iex&gt; CalendarInterval.relation(~I&quot;2018-02&quot;, ~I&quot;2018-01/12&quot
     </a>
     <span class="signature">sigil_I(arg, list)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L210" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L215" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -857,7 +865,7 @@ iex&gt; CalendarInterval.relation(~I&quot;2018-02&quot;, ~I&quot;2018-01/12&quot
     </a>
     <span class="signature">split(interval1, interval2)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L485" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L523" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -901,7 +909,7 @@ iex&gt; CalendarInterval.split(~I&quot;2018-01/12&quot;, ~I&quot;2019-01&quot;)
     </a>
     <span class="signature">to_string(calendar_interval)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L301" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L326" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -937,7 +945,7 @@ iex&gt; CalendarInterval.split(~I&quot;2018-01/12&quot;, ~I&quot;2019-01&quot;)
     </a>
     <span class="signature">union(interval1, interval2)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L531" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L565" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -981,7 +989,7 @@ nil</code></pre>
     </a>
     <span class="signature">utc_now(precision \\ {:microsecond, 6})</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L194" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L199" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
