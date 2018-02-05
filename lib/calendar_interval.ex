@@ -543,7 +543,7 @@ defmodule CalendarInterval do
   defp max_ndt(ndt1, ndt2), do: if(gteq?(ndt1, ndt2), do: ndt1, else: ndt2)
 
   @doc """
-  Returns a `t:relation/0` between `interval1` and `interval2`.
+  Returns a [`relation`](`t:CalendarInterval.relation/0`) between `interval1` and `interval2`.
 
   ## Examples
 
@@ -552,6 +552,9 @@ defmodule CalendarInterval do
 
       iex> CalendarInterval.relation(~I"2018-01/02", ~I"2018-03")
       :meets
+
+      iex> CalendarInterval.relation(~I"2018-02", ~I"2018-01/12")
+      :during
 
   """
   @spec relation(t(), t()) :: relation()
@@ -574,11 +577,6 @@ defmodule CalendarInterval do
       gt?(interval1.first, interval2.first) and
         gt?(interval1.last, interval2.last) and
         lt?(interval1.first, interval2.last) -> :overlapped_by
-
-      true ->
-        IO.inspect {interval1.first, interval1.last}
-        IO.inspect {interval2.first, interval2.last}
-        nil
     end
   end
 

@@ -234,7 +234,7 @@ he mentioned the concept of “Countable Time”.</p>
     <a href="#relation/2">relation(interval1, interval2)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Returns a <a href="#t:relation/0"><code class="inline">relation/0</code></a> between <code class="inline">interval1</code> and <code class="inline">interval2</code></p>
+    <div class="summary-synopsis"><p>Returns a <a href="CalendarInterval.html#t:relation/0"><code class="inline">relation</code></a> between <code class="inline">interval1</code> and <code class="inline">interval2</code></p>
 </div>
   
 </div>
@@ -772,7 +772,7 @@ iex&gt; CalendarInterval.prev(~I&quot;2018-09/12&quot;)
     </a>
     <span class="signature">relation(interval1, interval2)</span>
     
-      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L558" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L561" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -787,7 +787,7 @@ iex&gt; CalendarInterval.prev(~I&quot;2018-09/12&quot;)
     
   </div>
   <section class="docstring">
-    <p>Returns a <a href="#t:relation/0"><code class="inline">relation/0</code></a> between <code class="inline">interval1</code> and <code class="inline">interval2</code>.</p>
+    <p>Returns a <a href="CalendarInterval.html#t:relation/0"><code class="inline">relation</code></a> between <code class="inline">interval1</code> and <code class="inline">interval2</code>.</p>
 <h2 id="relation/2-examples" class="section-heading">
   <a href="#relation/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   Examples
@@ -797,7 +797,10 @@ iex&gt; CalendarInterval.prev(~I&quot;2018-09/12&quot;)
 :preceds
 
 iex&gt; CalendarInterval.relation(~I&quot;2018-01/02&quot;, ~I&quot;2018-03&quot;)
-:meets</code></pre>
+:meets
+
+iex&gt; CalendarInterval.relation(~I&quot;2018-02&quot;, ~I&quot;2018-01/12&quot;)
+:during</code></pre>
 
   </section>
 </div>
