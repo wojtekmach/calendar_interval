@@ -413,35 +413,25 @@ defmodule CalendarInterval do
   """
   @spec split(t(), t()) :: t() | {t(), t()} | {t(), t(), t()}
   def split(%{precision: p} = interval1, %{precision: p} = interval2) do
-    if intersection(interval1, interval2) do
-      case {interval1.first == interval2.first, interval1.last == interval2.last} do
-        #  AABBCC
-        #    XX
-        #  AA BB CC
-        {false, false} ->
-          a = i(interval1.first, prev(interval2).last, p)
-          b = i(interval2.first, interval2.last, p)
-          c = i(next(interval2).first, interval1.last, p)
-          {a, b, c}
+    case relation(interval2, interval1) do
+      :during ->
+        a = i(interval1.first, prev(interval2).last, p)
+        b = i(interval2.first, interval2.last, p)
+        c = i(next(interval2).first, interval1.last, p)
+        {a, b, c}
 
-        #  AABBCC
-        #  XX
-        #  AA BBCC
-        {true, false} ->
-          a = i(interval1.first, interval2.last, p)
-          b = i(next(interval2).first, interval1.last, p)
-          {a, b}
+      :starts ->
+        a = i(interval1.first, interval2.last, p)
+        b = i(next(interval2).first, interval1.last, p)
+        {a, b}
 
-        #  AABBCC
-        #      XX
-        #  AABB CC
-        {false, true} ->
-          a = i(interval1.first, prev(interval2).last, p)
-          b = i(interval2.first, interval2.last, p)
-          {a, b}
-      end
-    else
-      interval1
+      :finishes ->
+        a = i(interval1.first, prev(interval2).last, p)
+        b = i(interval2.first, interval2.last, p)
+        {a, b}
+
+      _ ->
+        interval1
     end
   end
 
