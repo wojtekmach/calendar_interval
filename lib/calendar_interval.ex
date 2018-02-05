@@ -128,7 +128,7 @@ defmodule CalendarInterval do
                         | bbbb
                         |
 
-  See: https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html
+  See: <https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html>
   """
   @type relation() ::
    :equal |
