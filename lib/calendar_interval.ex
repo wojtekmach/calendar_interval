@@ -195,7 +195,7 @@ defmodule CalendarInterval do
 
   """
   @spec utc_now(precision()) :: t()
-  def utc_now(precision \\ @microsecond) do
+  def utc_now(precision \\ @microsecond) when precision in @precisions do
     now = NaiveDateTime.utc_now()
     first = truncate(now, precision)
     last = next_ndt(first, precision, 1) |> prev_ndt(@microsecond, 1)
@@ -416,7 +416,7 @@ defmodule CalendarInterval do
 
   """
   @spec nest(t(), precision()) :: t()
-  def nest(%CalendarInterval{precision: old_precision} = interval, new_precision) do
+  def nest(%CalendarInterval{precision: old_precision} = interval, new_precision) when new_precision in @precisions do
     if precision_index(new_precision) > precision_index(old_precision) do
       %{interval | precision: new_precision}
     else
@@ -438,7 +438,7 @@ defmodule CalendarInterval do
 
   """
   @spec enclosing(t(), precision()) :: t()
-  def enclosing(%CalendarInterval{precision: old_precision} = interval, new_precision) do
+  def enclosing(%CalendarInterval{precision: old_precision} = interval, new_precision) when new_precision in @precisions do
     if precision_index(new_precision) < precision_index(old_precision) do
       interval.first |> truncate(new_precision) |> new(new_precision)
     else
