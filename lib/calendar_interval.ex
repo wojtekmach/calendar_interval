@@ -172,7 +172,7 @@ defmodule CalendarInterval do
   @spec new(NaiveDateTime.t() | Date.t(), precision()) :: t()
   def new(%NaiveDateTime{} = naive_datetime, precision) when precision in @precisions do
     first = truncate(naive_datetime, precision)
-    last = first |> next_ndt(precision, 1) |> prev_ndt({:microsecond, 6}, 1)
+    last = first |> next_ndt(precision, 1) |> prev_ndt(@microsecond, 1)
     new(first, last, precision)
   end
 
@@ -195,10 +195,10 @@ defmodule CalendarInterval do
 
   """
   @spec utc_now(precision()) :: t()
-  def utc_now(precision \\ {:microsecond, 6}) do
+  def utc_now(precision \\ @microsecond) do
     now = NaiveDateTime.utc_now()
     first = truncate(now, precision)
-    last = next_ndt(first, precision, 1) |> prev_ndt({:microsecond, 6}, 1)
+    last = next_ndt(first, precision, 1) |> prev_ndt(@microsecond, 1)
     new(first, last, precision)
   end
 
@@ -250,7 +250,7 @@ defmodule CalendarInterval do
   end
 
   defp do_parse!(<<_::26-bytes>> = string) do
-    {NaiveDateTime.from_iso8601!(string), {:microsecond, 6}}
+    {NaiveDateTime.from_iso8601!(string), @microsecond}
   end
 
   defp next_ndt(ndt, :year, step), do: update_in(ndt.year, &(&1 + step))
@@ -344,7 +344,7 @@ defmodule CalendarInterval do
     left <> "/" <> right
   end
 
-  defp format(ndt, {:microsecond, 6}) do
+  defp format(ndt, @microsecond) do
     NaiveDateTime.to_string(ndt)
   end
 
@@ -373,7 +373,7 @@ defmodule CalendarInterval do
   def next(%CalendarInterval{last: last, precision: precision}, step \\ 1)
       when step > 0 do
     last
-    |> next_ndt({:microsecond, 6}, 1)
+    |> next_ndt(@microsecond, 1)
     |> next_ndt(precision, step - 1)
     |> new(precision)
   end
@@ -453,7 +453,7 @@ defmodule CalendarInterval do
   defp truncate(ndt, :hour), do: %{ndt | minute: 0, second: 0, microsecond: {0, 6}}
   defp truncate(ndt, :minute), do: %{ndt | second: 0, microsecond: {0, 6}}
   defp truncate(ndt, :second), do: %{ndt | microsecond: {0, 6}}
-  defp truncate(ndt, {:microsecond, 6}), do: ndt
+  defp truncate(ndt, @microsecond), do: ndt
 
   defp truncate(%{microsecond: {microsecond, _}} = ndt, {:microsecond, precision}) do
     {1, n} = precision_to_count_unit({:microsecond, 6 - precision})
@@ -554,7 +554,7 @@ defmodule CalendarInterval do
   def union(interval1, interval2)
 
   def union(%CalendarInterval{precision: p} = i1, %CalendarInterval{precision: p} = i2) do
-    if intersection(i1, i2) != nil or next_ndt(i1.last, {:microsecond, 6}, 1) == i2.first do
+    if intersection(i1, i2) != nil or next_ndt(i1.last, @microsecond, 1) == i2.first do
       new(i1.first, i2.last, p)
     else
       nil
