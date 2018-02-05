@@ -1,0 +1,1024 @@
+    <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.18.2">
+    <title>CalendarInterval – calendar_interval v0.1.0-dev</title>
+    <link rel="stylesheet" href="dist/app-81d381dea4.css" />
+    
+    <script src="dist/sidebar_items-a22a45d951.js"></script>
+    
+    
+    
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+
+    <div class="main">
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Sidebar</span>
+</button>
+<button class="sidebar-button night-mode-toggle">
+  <span class="icon-theme" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Theme</span>
+</button>
+<section class="sidebar">
+
+  
+  <a href="CalendarInterval.html" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        calendar_interval
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0-dev
+      </h2>
+    </div>
+    
+  </a>
+
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <input name="q" type="text" id="search-list" class="search-input" placeholder="Search" aria-label="Search" autocomplete="off" />
+  </form>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+    
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+    
+
+    
+
+    
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="visible-xs">calendar_interval v0.1.0-dev</small>
+        CalendarInterval
+        
+          <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L1" title="View Source" class="view-source" rel="help">
+            <span class="icon-code" aria-hidden="true"></span>
+            <span class="sr-only">View Source</span>
+          </a>
+        
+      </h1>
+
+      
+        <section id="moduledoc">
+          <p>Functions for working with calendar intervals.</p>
+<ul>
+<li>Text representation functions: <a href="#parse!/1"><code class="inline">parse!/1</code></a>, <a href="#to_string/1"><code class="inline">to_string/1</code></a>, <a href="#sigil_I/2"><code class="inline">sigil_I/2</code></a>
+</li>
+<li>“Countable Time” [1] operations: <a href="#enclosing/2"><code class="inline">enclosing/2</code></a>, <a href="#nest/2"><code class="inline">nest/2</code></a>, <a href="#next/1"><code class="inline">next/1</code></a>, <a href="#prev/1"><code class="inline">prev/1</code></a>
+</li>
+<li>Set-like operations: <a href="#intersection/2"><code class="inline">intersection/2</code></a>, <a href="#union/2"><code class="inline">union/2</code></a>
+</li>
+<li>Other functions: <a href="#new/2"><code class="inline">new/2</code></a>, <a href="#utc_now/1"><code class="inline">utc_now/1</code></a>, <a href="#split/2"><code class="inline">split/2</code></a>
+</li>
+</ul>
+<h2 id="module-examples" class="section-heading">
+  <a href="#module-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="elixir">use CalendarInterval
+
+iex&gt; ~I&quot;2018-06&quot;.precision
+:month
+
+iex&gt; CalendarInterval.next(~I&quot;2018-12-31&quot;)
+~I&quot;2019-01-01&quot;
+
+iex&gt; CalendarInterval.nest(~I&quot;2018-06-15&quot;, :minute)
+~I&quot;2018-06-15 00:00/23:59&quot;
+
+iex&gt; Enum.count(~I&quot;2016-01-01/12-31&quot;)
+366</code></pre>
+<h2 id="module-references" class="section-heading">
+  <a href="#module-references" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  References
+</h2>
+
+<p>This library is inspired by “Exploring Time” talk by Eric Evans [1] where
+he mentioned the concept of “Countable Time”.</p>
+<p>[1] <a href="https://www.youtube.com/watch?v=Zm95cYAtAa8">https://www.youtube.com/watch?v=Zm95cYAtAa8</a></p>
+
+        </section>
+      
+
+      
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+          
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:precision/0">precision()</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:relation/0">relation()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Relation between two intervals according to Allen’s Interval Algebra</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:t/0">t()</a>
+  </div>
+  
+</div>
+
+  </div>
+
+
+          
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#enclosing/2">enclosing(interval, new_precision)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns interval that encloses given interval</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#intersection/2">intersection(interval1, interval2)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns an intersection of <code class="inline">interval1</code> and <code class="inline">interval2</code> or <code class="inline">nil</code> if they don’t overlap</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#nest/2">nest(interval, new_precision)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns an interval within given interval</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#new/2">new(naive_datetime, precision)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns an interval starting at given date truncated to <code class="inline">precision</code></p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#next/1">next(calendar_interval)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns next interval</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#parse!/1">parse!(string)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parses a string into an interval</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#prev/1">prev(calendar_interval)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns previous interval</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#relation/2">relation(interval1, interval2)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns a <a href="#t:relation/0"><code class="inline">relation/0</code></a> between <code class="inline">interval1</code> and <code class="inline">interval2</code></p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#sigil_I/2">sigil_I(arg, list)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Handles the <code class="inline">~I</code> sigil for intervals</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#split/2">split(interval1, interval2)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Splits interval by another interval</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#to_string/1">to_string(calendar_interval)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns string representation</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#union/2">union(interval1, interval2)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns an union of <code class="inline">interval1</code> and <code class="inline">interval2</code> or <code class="inline">nil</code></p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#utc_now/1">utc_now(precision \\ {:microsecond, 6})</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns an interval for the current UTC time in given <code class="inline">precision</code></p>
+</div>
+  
+</div>
+
+  </div>
+
+
+          
+
+        </section>
+      
+
+      
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Types
+          </h1>
+          <div class="types-list">
+            <div class="detail" id="t:precision/0">
+  
+  
+  <div class="detail-header">
+    <a href="#t:precision/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <span class="signature">precision()</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L43" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>precision() ::
+  :year | :month | :day | :hour | :minute | :second | {:microsecond, 1..6}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="t:relation/0">
+  
+  
+  <div class="detail-header">
+    <a href="#t:relation/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <span class="signature">relation()</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L133" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>relation() ::
+  :equal
+  | :meets
+  | :met_by
+  | :preceds
+  | :preceded_by
+  | :starts
+  | :started_by
+  | :finishes
+  | :finished_by
+  | :during
+  | :contains
+  | :overlaps
+  | :overlapped_by</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Relation between two intervals according to Allen’s Interval Algebra.</p>
+<pre><code class="elixir">                  |
+a preceds b       | aaaa
+                  |       bbbb
+-------------------------------
+                  |
+a meets b         | aaaa
+                  |     bbbb
+                  |
+-------------------------------
+                  |
+a overlaps b      | aaaa
+                  |   bbbb
+                  |
+-------------------------------
+                  |
+a finished by b   | aaaa
+                  |   bb
+                  |
+-------------------------------
+                  |
+a contains b      | aaaaaa
+                  |   bb
+                  |
+-------------------------------
+                  |
+a starts b        |  aa
+                  |  bbbb
+                  |
+-------------------------------
+                  |
+a equals b        | aaaa
+                  | bbbb
+                  |
+-------------------------------
+                  |
+a started by b    | aaaa
+                  | bb
+                  |
+-------------------------------
+                  |
+a during b        |   aa
+                  | bbbbbb
+                  |
+-------------------------------
+                  |
+a finishes b      |   aa
+                  | bbbb
+                  |
+-------------------------------
+                  |
+a overlapped by b |   aaaa
+                  | bbbb
+                  |
+-------------------------------
+                  |
+a met by b        |     aaaa
+                  | bbbb
+                  |
+-------------------------------
+                  |
+a preceded by b   |       aaaa
+                  | bbbb
+                  |</code></pre>
+<p>See: https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html</p>
+
+  </section>
+</div>
+<div class="detail" id="t:t/0">
+  
+  
+  <div class="detail-header">
+    <a href="#t:t/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <span class="signature">t()</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L37" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>t() :: %CalendarInterval{
+  first: <a href="https://hexdocs.pm/elixir/NaiveDateTime.html#t:t/0">NaiveDateTime.t</a>(),
+  last: <a href="https://hexdocs.pm/elixir/NaiveDateTime.html#t:t/0">NaiveDateTime.t</a>(),
+  precision: <a href="#t:precision/0">precision</a>()
+}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+
+          </div>
+        </section>
+      
+
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="enclosing/2">
+  
+  
+  <div class="detail-header">
+    <a href="#enclosing/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">enclosing(interval, new_precision)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L406" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>enclosing(<a href="#t:t/0">t</a>(), <a href="#t:precision/0">precision</a>()) :: <a href="#t:t/0">t</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns interval that encloses given interval.</p>
+<h2 id="enclosing/2-example" class="section-heading">
+  <a href="#enclosing/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.enclosing(~I&quot;2018-05-01&quot;, :year)
+~I&quot;2018&quot;
+
+iex&gt; CalendarInterval.enclosing(~I&quot;2018-06-15&quot;, :second)
+** (ArgumentError) cannot enclose from :day to :second</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="intersection/2">
+  
+  
+  <div class="detail-header">
+    <a href="#intersection/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">intersection(interval1, interval2)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L451" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>intersection(<a href="#t:t/0">t</a>(), <a href="#t:t/0">t</a>()) :: <a href="#t:t/0">t</a>() | nil</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns an intersection of <code class="inline">interval1</code> and <code class="inline">interval2</code> or <code class="inline">nil</code> if they don’t overlap.</p>
+<p>Both intervals must have the same <code class="inline">precision</code>.</p>
+<h2 id="intersection/2-examples" class="section-heading">
+  <a href="#intersection/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.intersection(~I&quot;2018-01/04&quot;, ~I&quot;2018-03/06&quot;)
+~I&quot;2018-03/04&quot;
+iex&gt; CalendarInterval.intersection(~I&quot;2018-01/12&quot;, ~I&quot;2018-02&quot;)
+~I&quot;2018-02&quot;
+
+iex&gt; CalendarInterval.intersection(~I&quot;2018-01/02&quot;, ~I&quot;2018-11/12&quot;)
+nil</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="nest/2">
+  
+  
+  <div class="detail-header">
+    <a href="#nest/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">nest(interval, new_precision)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L384" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>nest(<a href="#t:t/0">t</a>(), <a href="#t:precision/0">precision</a>()) :: <a href="#t:t/0">t</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns an interval within given interval.</p>
+<h2 id="nest/2-example" class="section-heading">
+  <a href="#nest/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.nest(~I&quot;2018&quot;, :day)
+~I&quot;2018-01-01/12-31&quot;
+
+iex&gt; CalendarInterval.nest(~I&quot;2018-06-15&quot;, :minute)
+~I&quot;2018-06-15 00:00/23:59&quot;
+
+iex&gt; CalendarInterval.nest(~I&quot;2018-06-15&quot;, :year)
+** (ArgumentError) cannot nest from :day to :year</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="new/2">
+  
+  
+  <div class="detail-header">
+    <a href="#new/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">new(naive_datetime, precision)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L173" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>new(<a href="https://hexdocs.pm/elixir/NaiveDateTime.html#t:t/0">NaiveDateTime.t</a>() | <a href="https://hexdocs.pm/elixir/Date.html#t:t/0">Date.t</a>(), <a href="#t:precision/0">precision</a>()) :: <a href="#t:t/0">t</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns an interval starting at given date truncated to <code class="inline">precision</code>.</p>
+<h2 id="new/2-examples" class="section-heading">
+  <a href="#new/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.new(~N&quot;2018-06-15 10:20:30.134&quot;, :minute)
+~I&quot;2018-06-15 10:20&quot;
+
+iex&gt; CalendarInterval.new(~D&quot;2018-06-15&quot;, :minute)
+~I&quot;2018-06-15 00:00&quot;</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="next/1">
+  
+  
+  <div class="detail-header">
+    <a href="#next/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">next(calendar_interval)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L347" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>next(<a href="#t:t/0">t</a>()) :: <a href="#t:t/0">t</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns next interval.</p>
+<h2 id="next/1-examples" class="section-heading">
+  <a href="#next/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.next(~I&quot;2018-06-30&quot;)
+~I&quot;2018-07-01&quot;
+
+iex&gt; CalendarInterval.next(~I&quot;2018-01/06&quot;)
+~I&quot;2018-07&quot;</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="parse!/1">
+  
+  
+  <div class="detail-header">
+    <a href="#parse!/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">parse!(string)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L221" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>parse!(<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) :: <a href="#t:t/0">t</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parses a string into an interval.</p>
+<h2 id="parse!/1-examples" class="section-heading">
+  <a href="#parse!/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.parse!(&quot;2018-06-30&quot;)
+~I&quot;2018-06-30&quot;
+
+iex&gt; CalendarInterval.parse!(&quot;2018-06-01/30&quot;)
+~I&quot;2018-06-01/30&quot;</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="prev/1">
+  
+  
+  <div class="detail-header">
+    <a href="#prev/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">prev(calendar_interval)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L364" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>prev(<a href="#t:t/0">t</a>()) :: <a href="#t:t/0">t</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns previous interval.</p>
+<h2 id="prev/1-examples" class="section-heading">
+  <a href="#prev/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.prev(~I&quot;2018-06-01&quot;)
+~I&quot;2018-05-31&quot;
+
+iex&gt; CalendarInterval.prev(~I&quot;2018-09/12&quot;)
+~I&quot;2018-08&quot;</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="relation/2">
+  
+  
+  <div class="detail-header">
+    <a href="#relation/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">relation(interval1, interval2)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L558" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>relation(<a href="#t:t/0">t</a>(), <a href="#t:t/0">t</a>()) :: <a href="#t:relation/0">relation</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns a <a href="#t:relation/0"><code class="inline">relation/0</code></a> between <code class="inline">interval1</code> and <code class="inline">interval2</code>.</p>
+<h2 id="relation/2-examples" class="section-heading">
+  <a href="#relation/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.relation(~I&quot;2018-01/02&quot;, ~I&quot;2018-06&quot;)
+:preceds
+
+iex&gt; CalendarInterval.relation(~I&quot;2018-01/02&quot;, ~I&quot;2018-03&quot;)
+:meets</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="sigil_I/2">
+  
+  
+  <div class="detail-header">
+    <a href="#sigil_I/2" class="detail-link" title="Link to this macro">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this macro</span>
+    </a>
+    <span class="signature">sigil_I(arg, list)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L204" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+      <span class="note">(macro)</span>
+    
+    
+  </div>
+  <section class="docstring">
+    <p>Handles the <code class="inline">~I</code> sigil for intervals.</p>
+<h2 id="sigil_I/2-examples" class="section-heading">
+  <a href="#sigil_I/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; ~I&quot;2018-06&quot;.precision
+:month</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="split/2">
+  
+  
+  <div class="detail-header">
+    <a href="#split/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">split(interval1, interval2)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L479" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>split(<a href="#t:t/0">t</a>(), <a href="#t:t/0">t</a>()) :: <a href="#t:t/0">t</a>() | {<a href="#t:t/0">t</a>(), <a href="#t:t/0">t</a>()} | {<a href="#t:t/0">t</a>(), <a href="#t:t/0">t</a>(), <a href="#t:t/0">t</a>()}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Splits interval by another interval.</p>
+<h2 id="split/2-examples" class="section-heading">
+  <a href="#split/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.split(~I&quot;2018-01/12&quot;, ~I&quot;2018-04/05&quot;)
+{~I&quot;2018-01/03&quot;, ~I&quot;2018-04/05&quot;, ~I&quot;2018-06/12&quot;}
+
+iex&gt; CalendarInterval.split(~I&quot;2018-01/12&quot;, ~I&quot;2018-01/02&quot;)
+{~I&quot;2018-01/02&quot;, ~I&quot;2018-03/12&quot;}
+iex&gt; CalendarInterval.split(~I&quot;2018-01/12&quot;, ~I&quot;2018-08/12&quot;)
+{~I&quot;2018-01/07&quot;, ~I&quot;2018-08/12&quot;}
+
+iex&gt; CalendarInterval.split(~I&quot;2018-01/12&quot;, ~I&quot;2019-01&quot;)
+~I&quot;2018-01/12&quot;</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="to_string/1">
+  
+  
+  <div class="detail-header">
+    <a href="#to_string/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">to_string(calendar_interval)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L295" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>to_string(<a href="#t:t/0">t</a>()) :: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns string representation.</p>
+<h2 id="to_string/1-examples" class="section-heading">
+  <a href="#to_string/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.to_string(~I&quot;2018-06&quot;)
+&quot;2018-06&quot;</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="union/2">
+  
+  
+  <div class="detail-header">
+    <a href="#union/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">union(interval1, interval2)</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L525" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>union(<a href="#t:t/0">t</a>(), <a href="#t:t/0">t</a>()) :: <a href="#t:t/0">t</a>() | nil</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns an union of <code class="inline">interval1</code> and <code class="inline">interval2</code> or <code class="inline">nil</code>.</p>
+<p>Both intervals must have the same <code class="inline">precision</code>.</p>
+<h2 id="union/2-examples" class="section-heading">
+  <a href="#union/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.union(~I&quot;2018-01/02&quot;, ~I&quot;2018-01/04&quot;)
+~I&quot;2018-01/04&quot;
+iex&gt; CalendarInterval.union(~I&quot;2018-01/11&quot;, ~I&quot;2018-12&quot;)
+~I&quot;2018-01/12&quot;
+
+iex&gt; CalendarInterval.union(~I&quot;2018-01/02&quot;, ~I&quot;2018-04/05&quot;)
+nil</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="utc_now/1">
+  
+  
+    <span id="utc_now/0"></span>
+  
+  <div class="detail-header">
+    <a href="#utc_now/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">utc_now(precision \\ {:microsecond, 6})</span>
+    
+      <a href="https://github.com/wojtekmach/calendar_interval/blob/v0.1.0-dev/lib/calendar_interval.ex#L188" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>utc_now(<a href="#t:precision/0">precision</a>()) :: <a href="#t:t/0">t</a>()</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Returns an interval for the current UTC time in given <code class="inline">precision</code>.</p>
+<h2 id="utc_now/1-examples" class="section-heading">
+  <a href="#utc_now/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CalendarInterval.utc_now(:month) in ~I&quot;2018/2100&quot;
+true</code></pre>
+
+  </section>
+</div>
+
+        </section>
+      
+
+      
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.18.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+            </span>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  <script src="dist/app-ad33bc0e7d.js"></script>
+  
+  
+  
+  
+  </body>
+</html>
+
