@@ -181,7 +181,8 @@ defmodule CalendarInterval do
     new(ndt, precision)
   end
 
-  defp new(%NaiveDateTime{} = first, %NaiveDateTime{} = last, precision) when precision in @precisions do
+  defp new(%NaiveDateTime{} = first, %NaiveDateTime{} = last, precision)
+       when precision in @precisions do
     %CalendarInterval{first: first, last: last, precision: precision}
   end
 
@@ -299,8 +300,14 @@ defmodule CalendarInterval do
   @doc false
   def count(%CalendarInterval{first: %{year: year1}, last: %{year: year2}, precision: :year}),
     do: year2 - year1 + 1
-  def count(%CalendarInterval{first: %{year: year1, month: month1}, last: %{year: year2, month: month2}, precision: :month}),
-    do: month2 + (year2 * 12) - month1 - (year1 * 12) + 1
+
+  def count(%CalendarInterval{
+        first: %{year: year1, month: month1},
+        last: %{year: year2, month: month2},
+        precision: :month
+      }),
+      do: month2 + year2 * 12 - month1 - year1 * 12 + 1
+
   def count(%CalendarInterval{first: first, last: last, precision: precision}) do
     {count, unit} = precision_to_count_unit(precision)
     div(NaiveDateTime.diff(last, first, unit), count) + 1
@@ -416,7 +423,8 @@ defmodule CalendarInterval do
 
   """
   @spec nest(t(), precision()) :: t()
-  def nest(%CalendarInterval{precision: old_precision} = interval, new_precision) when new_precision in @precisions do
+  def nest(%CalendarInterval{precision: old_precision} = interval, new_precision)
+      when new_precision in @precisions do
     if precision_index(new_precision) > precision_index(old_precision) do
       %{interval | precision: new_precision}
     else
@@ -438,7 +446,8 @@ defmodule CalendarInterval do
 
   """
   @spec enclosing(t(), precision()) :: t()
-  def enclosing(%CalendarInterval{precision: old_precision} = interval, new_precision) when new_precision in @precisions do
+  def enclosing(%CalendarInterval{precision: old_precision} = interval, new_precision)
+      when new_precision in @precisions do
     if precision_index(new_precision) < precision_index(old_precision) do
       interval.first |> truncate(new_precision) |> new(new_precision)
     else
