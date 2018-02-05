@@ -129,4 +129,28 @@ defmodule CalendarIntervalTest do
     assert Enum.count(~I"2018-01-01/12-31") == 365
     assert Enum.count(~I"2016-01-01/12-31") == 366
   end
+
+  test "relation" do
+    import CalendarInterval, only: [relation: 2, sigil_I: 2]
+
+    assert relation(~I"2018", ~I"2018") == :equal
+
+    assert relation(~I"2017", ~I"2018") == :meets
+    assert relation(~I"2018", ~I"2017") == :met_by
+
+    assert relation(~I"2016", ~I"2018") == :before
+    assert relation(~I"2018", ~I"2016") == :after
+
+    assert relation(~I"2018", ~I"2018/2019") == :starts
+    assert relation(~I"2018/2019", ~I"2018") == :started_by
+
+    assert relation(~I"2019", ~I"2018/2019") == :finishes
+    assert relation(~I"2018/2019", ~I"2019") == :finished_by
+
+    assert relation(~I"2018/2019", ~I"2010/2020") == :during
+    assert relation(~I"2010/2020", ~I"2018/2019") == :contains
+
+    assert relation(~I"2000/2015", ~I"2010/2020") == :overlaps
+    assert relation(~I"2010/2020", ~I"2000/2015") == :overlapped_by
+  end
 end

@@ -59,6 +59,28 @@ defmodule CalendarInterval do
     {{:microsecond, 5}, 25, "0"}
   ]
 
+  @microsecond {:microsecond, 6}
+
+  @typedoc """
+  Relation between two intervals according to Allen's Interval Algebra.
+
+  See: https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html
+  """
+  @type relation() ::
+   :equal |
+   :meets |
+   :met_by |
+   :before |
+   :after |
+   :starts |
+   :started_by |
+   :finishes |
+   :finished_by |
+   :during |
+   :contains |
+   :overlaps |
+   :overlapped_by
+
   defmacro __using__(_) do
     quote do
       import CalendarInterval, only: [sigil_I: 2]
@@ -454,6 +476,10 @@ defmodule CalendarInterval do
     end
   end
 
+  defp lt?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) == :lt
+
+  defp gt?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) == :gt
+
   defp lteq?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) in [:lt, :eq]
 
   defp gteq?(ndt1, ndt2), do: NaiveDateTime.compare(ndt1, ndt2) in [:gt, :eq]
@@ -461,6 +487,46 @@ defmodule CalendarInterval do
   defp min_ndt(ndt1, ndt2), do: if(lteq?(ndt1, ndt2), do: ndt1, else: ndt2)
 
   defp max_ndt(ndt1, ndt2), do: if(gteq?(ndt1, ndt2), do: ndt1, else: ndt2)
+
+  @doc """
+  Returns a `t:relation/0` between `interval1` and `interval2`.
+
+  ## Examples
+
+      iex> CalendarInterval.relation(~I"2018-01/02", ~I"2018-06")
+      :before
+
+      iex> CalendarInterval.relation(~I"2018-01/02", ~I"2018-03")
+      :meets
+
+  """
+  @spec relation(t(), t()) :: relation()
+  def relation(%{precision: p} = interval1, %{precision: p} = interval2) do
+    cond do
+      interval1 == interval2 -> :equal
+      interval2.first == next_ndt(interval1.last, @microsecond) -> :meets
+      interval2.last == prev_ndt(interval1.first, @microsecond) -> :met_by
+      lt?(interval1.last, interval2.first) -> :before
+      gt?(interval1.first, interval2.last) -> :after
+      interval1.first == interval2.first and lt?(interval1.last, interval2.last) -> :starts
+      interval1.first == interval2.first and gt?(interval1.last, interval2.last) -> :started_by
+      interval1.last == interval2.last and gt?(interval1.first, interval2.first) -> :finishes
+      interval1.last == interval2.last and lt?(interval1.first, interval2.first) -> :finished_by
+      gt?(interval1.first, interval2.first) and lt?(interval1.last, interval2.last) -> :during
+      lt?(interval1.first, interval2.first) and gt?(interval1.last, interval2.last) -> :contains
+      lt?(interval1.first, interval2.first) and
+        lt?(interval1.last, interval2.last) and
+        gt?(interval1.last, interval2.first) -> :overlaps
+      gt?(interval1.first, interval2.first) and
+        gt?(interval1.last, interval2.last) and
+        lt?(interval1.first, interval2.last) -> :overlapped_by
+
+      true ->
+        IO.inspect {interval1.first, interval1.last}
+        IO.inspect {interval2.first, interval2.last}
+        nil
+    end
+  end
 
   defimpl String.Chars do
     defdelegate to_string(interval), to: CalendarInterval
