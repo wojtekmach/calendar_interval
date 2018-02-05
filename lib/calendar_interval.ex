@@ -65,7 +65,7 @@ defmodule CalendarInterval do
   Relation between two intervals according to Allen's Interval Algebra.
 
                         |
-      a before b        | aaaa
+      a preceds b       | aaaa
                         |       bbbb
       -------------------------------
                         |
@@ -124,7 +124,7 @@ defmodule CalendarInterval do
                         |
       -------------------------------
                         |
-      a after b         |       aaaa
+      a preceded by b   |       aaaa
                         | bbbb
                         |
 
@@ -134,8 +134,8 @@ defmodule CalendarInterval do
    :equal |
    :meets |
    :met_by |
-   :before |
-   :after |
+   :preceds |
+   :preceded_by |
    :starts |
    :started_by |
    :finishes |
@@ -548,7 +548,7 @@ defmodule CalendarInterval do
   ## Examples
 
       iex> CalendarInterval.relation(~I"2018-01/02", ~I"2018-06")
-      :before
+      :preceds
 
       iex> CalendarInterval.relation(~I"2018-01/02", ~I"2018-03")
       :meets
@@ -560,8 +560,8 @@ defmodule CalendarInterval do
       interval1 == interval2 -> :equal
       interval2.first == next_ndt(interval1.last, @microsecond) -> :meets
       interval2.last == prev_ndt(interval1.first, @microsecond) -> :met_by
-      lt?(interval1.last, interval2.first) -> :before
-      gt?(interval1.first, interval2.last) -> :after
+      lt?(interval1.last, interval2.first) -> :preceds
+      gt?(interval1.first, interval2.last) -> :preceded_by
       interval1.first == interval2.first and lt?(interval1.last, interval2.last) -> :starts
       interval1.first == interval2.first and gt?(interval1.last, interval2.last) -> :started_by
       interval1.last == interval2.last and gt?(interval1.first, interval2.first) -> :finishes
