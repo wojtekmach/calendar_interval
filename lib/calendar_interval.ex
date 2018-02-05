@@ -6,7 +6,7 @@ defmodule CalendarInterval do
   * "Countable Time" [1] operations: `enclosing/2`, `nest/2`, `next/1`, `prev/1`
   * Set-like operations: `intersection/2`, `union/2`
   * Other functions: `new/2`, `utc_now/1`, `split/2`
-  * Allen's Interval Algebra: `relation/2` (replacement of `==`, `>=` etc)
+  * Allen's Interval Algebra: `relation/2` (replacement for `==`, `>=` etc)
 
   ## Examples
 
