@@ -64,6 +64,70 @@ defmodule CalendarInterval do
   @typedoc """
   Relation between two intervals according to Allen's Interval Algebra.
 
+                        |
+      a before b        | aaaa
+                        |       bbbb
+      -------------------------------
+                        |
+      a meets b         | aaaa
+                        |     bbbb
+                        |
+      -------------------------------
+                        |
+      a overlaps b      | aaaa
+                        |   bbbb
+                        |
+      -------------------------------
+                        |
+      a finished by b   | aaaa
+                        |   bb
+                        |
+      -------------------------------
+                        |
+      a contains b      | aaaaaa
+                        |   bb
+                        |
+      -------------------------------
+                        |
+      a starts b        |  aa
+                        |  bbbb
+                        |
+      -------------------------------
+                        |
+      a equals b        | aaaa
+                        | bbbb
+                        |
+      -------------------------------
+                        |
+      a started by b    | aaaa
+                        | bb
+                        |
+      -------------------------------
+                        |
+      a during b        |   aa
+                        | bbbbbb
+                        |
+      -------------------------------
+                        |
+      a finishes b      |   aa
+                        | bbbb
+                        |
+      -------------------------------
+                        |
+      a overlapped by b |   aaaa
+                        | bbbb
+                        |
+      -------------------------------
+                        |
+      a met by b        |     aaaa
+                        | bbbb
+                        |
+      -------------------------------
+                        |
+      a after b         |       aaaa
+                        | bbbb
+                        |
+
   See: https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html
   """
   @type relation() ::
