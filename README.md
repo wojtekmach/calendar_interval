@@ -27,7 +27,7 @@ iex> Enum.count(~I"2016-01-01/12-31")
 
 ## References
 
-This library is inspired by "Exploring Time" talk by Eric Evans [1] where
+This library is heavily inspired by "Exploring Time" talk by Eric Evans [1] where
 he mentioned the concept of "Countable Time" and introduced me to
 "Allen's Interval Algebra" [2].
 
