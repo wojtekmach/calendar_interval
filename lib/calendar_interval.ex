@@ -679,7 +679,7 @@ defmodule CalendarInterval do
     end
 
     def slice(interval) do
-      {:ok, CalendarInterval.count(interval), &slice(interval, &1, &2)}
+      {:ok, CalendarInterval.count(interval), &slice(interval, &1 + 1, &2)}
     end
 
     defp slice(first, start, count) do
