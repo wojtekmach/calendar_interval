@@ -31,8 +31,8 @@ This library is heavily inspired by "Exploring Time" talk by Eric Evans [1] wher
 he mentioned the concept of "Countable Time" and introduced me to
 "Allen's Interval Algebra" [2].
 
-[1] <https://www.youtube.com/watch?v=Zm95cYAtAa8>
-[2] <https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html>
+- [1] <https://www.youtube.com/watch?v=Zm95cYAtAa8>
+- [2] <https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html>
 
 ## Installation
 
