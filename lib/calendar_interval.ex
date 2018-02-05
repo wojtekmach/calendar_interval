@@ -172,7 +172,7 @@ defmodule CalendarInterval do
   @spec new(NaiveDateTime.t() | Date.t(), precision()) :: t()
   def new(%NaiveDateTime{} = naive_datetime, precision) do
     first = truncate(naive_datetime, precision)
-    last = first |> next_ndt(precision) |> prev_ndt({:microsecond, 6})
+    last = first |> next_ndt(precision, 1) |> prev_ndt({:microsecond, 6})
     %CalendarInterval{first: first, last: last, precision: precision}
   end
 
@@ -194,7 +194,7 @@ defmodule CalendarInterval do
   def utc_now(precision \\ {:microsecond, 6}) do
     now = NaiveDateTime.utc_now()
     first = truncate(now, precision)
-    last = next_ndt(first, precision) |> prev_ndt({:microsecond, 6})
+    last = next_ndt(first, precision, 1) |> prev_ndt({:microsecond, 6})
     %CalendarInterval{first: first, last: last, precision: precision}
   end
 
@@ -249,19 +249,21 @@ defmodule CalendarInterval do
     {NaiveDateTime.from_iso8601!(string), {:microsecond, 6}}
   end
 
-  defp next_ndt(ndt, :year), do: update_in(ndt.year, &(&1 + 1))
+  defp next_ndt(ndt, :year, step), do: update_in(ndt.year, &(&1 + step))
 
-  defp next_ndt(%NaiveDateTime{year: year, month: 12} = ndt, :month) do
-    %{ndt | year: year + 1, month: 1}
+  defp next_ndt(%NaiveDateTime{year: year, month: month} = ndt, :month, step) do
+    {plus_year, month} = {div(month + step, 12), rem(month + step, 12)}
+
+    if month == 0 do
+      %{ndt | year: year + plus_year, month: 1}
+    else
+      %{ndt | year: year + plus_year, month: month}
+    end
   end
 
-  defp next_ndt(%NaiveDateTime{month: month} = ndt, :month) do
-    %{ndt | month: month + 1}
-  end
-
-  defp next_ndt(ndt, precision) do
+  defp next_ndt(ndt, precision, step) do
     {count, unit} = precision_to_count_unit(precision)
-    NaiveDateTime.add(ndt, count, unit)
+    NaiveDateTime.add(ndt, count * step, unit)
   end
 
   defp prev_ndt(ndt, :year), do: update_in(ndt.year, &(&1 - 1))
@@ -354,14 +356,20 @@ defmodule CalendarInterval do
 
       iex> CalendarInterval.next(~I"2018-06-30")
       ~I"2018-07-01"
+      iex> CalendarInterval.next(~I"2018-06-30 09:00", 80)
+      ~I"2018-06-30 10:20"
 
       iex> CalendarInterval.next(~I"2018-01/06")
       ~I"2018-07"
 
   """
-  @spec next(t()) :: t()
-  def next(%CalendarInterval{last: last, precision: precision}) do
-    last |> next_ndt({:microsecond, 6}) |> new(precision)
+  @spec next(t(), step :: integer()) :: t()
+  def next(%CalendarInterval{last: last, precision: precision}, step \\ 1)
+      when step > 0 do
+    last
+    |> next_ndt({:microsecond, 6}, 1)
+    |> next_ndt(precision, step - 1)
+    |> new(precision)
   end
 
   @doc """
@@ -539,7 +547,7 @@ defmodule CalendarInterval do
   def union(interval1, interval2)
 
   def union(%CalendarInterval{precision: p} = i1, %CalendarInterval{precision: p} = i2) do
-    if intersection(i1, i2) != nil or next_ndt(i1.last, {:microsecond, 6}) == i2.first do
+    if intersection(i1, i2) != nil or next_ndt(i1.last, {:microsecond, 6}, 1) == i2.first do
       %CalendarInterval{first: i1.first, last: i2.last, precision: p}
     else
       nil
@@ -579,7 +587,7 @@ defmodule CalendarInterval do
       interval1 == interval2 ->
         :equal
 
-      interval2.first == next_ndt(interval1.last, @microsecond) ->
+      interval2.first == next_ndt(interval1.last, @microsecond, 1) ->
         :meets
 
       interval2.last == prev_ndt(interval1.first, @microsecond) ->
