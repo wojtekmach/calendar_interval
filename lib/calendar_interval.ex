@@ -20,6 +20,9 @@ defmodule CalendarInterval do
       iex> CalendarInterval.nest(~I"2018-06-15", :minute)
       ~I"2018-06-15 00:00/23:59"
 
+      iex> CalendarInterval.relation(~I"2018-01", ~I"2018-02/12")
+      :meets
+
       iex> Enum.count(~I"2016-01-01/12-31")
       366
 
