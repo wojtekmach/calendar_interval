@@ -137,19 +137,19 @@ defmodule CalendarInterval do
   See: <https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html>
   """
   @type relation() ::
-   :equal |
-   :meets |
-   :met_by |
-   :preceds |
-   :preceded_by |
-   :starts |
-   :started_by |
-   :finishes |
-   :finished_by |
-   :during |
-   :contains |
-   :overlaps |
-   :overlapped_by
+          :equal
+          | :meets
+          | :met_by
+          | :preceds
+          | :preceded_by
+          | :starts
+          | :started_by
+          | :finishes
+          | :finished_by
+          | :during
+          | :contains
+          | :overlaps
+          | :overlapped_by
 
   defmacro __using__(_) do
     quote do
@@ -566,23 +566,46 @@ defmodule CalendarInterval do
   @spec relation(t(), t()) :: relation()
   def relation(%{precision: p} = interval1, %{precision: p} = interval2) do
     cond do
-      interval1 == interval2 -> :equal
-      interval2.first == next_ndt(interval1.last, @microsecond) -> :meets
-      interval2.last == prev_ndt(interval1.first, @microsecond) -> :met_by
-      lt?(interval1.last, interval2.first) -> :preceds
-      gt?(interval1.first, interval2.last) -> :preceded_by
-      interval1.first == interval2.first and lt?(interval1.last, interval2.last) -> :starts
-      interval1.first == interval2.first and gt?(interval1.last, interval2.last) -> :started_by
-      interval1.last == interval2.last and gt?(interval1.first, interval2.first) -> :finishes
-      interval1.last == interval2.last and lt?(interval1.first, interval2.first) -> :finished_by
-      gt?(interval1.first, interval2.first) and lt?(interval1.last, interval2.last) -> :during
-      lt?(interval1.first, interval2.first) and gt?(interval1.last, interval2.last) -> :contains
-      lt?(interval1.first, interval2.first) and
-        lt?(interval1.last, interval2.last) and
-        gt?(interval1.last, interval2.first) -> :overlaps
-      gt?(interval1.first, interval2.first) and
-        gt?(interval1.last, interval2.last) and
-        lt?(interval1.first, interval2.last) -> :overlapped_by
+      interval1 == interval2 ->
+        :equal
+
+      interval2.first == next_ndt(interval1.last, @microsecond) ->
+        :meets
+
+      interval2.last == prev_ndt(interval1.first, @microsecond) ->
+        :met_by
+
+      lt?(interval1.last, interval2.first) ->
+        :preceds
+
+      gt?(interval1.first, interval2.last) ->
+        :preceded_by
+
+      interval1.first == interval2.first and lt?(interval1.last, interval2.last) ->
+        :starts
+
+      interval1.first == interval2.first and gt?(interval1.last, interval2.last) ->
+        :started_by
+
+      interval1.last == interval2.last and gt?(interval1.first, interval2.first) ->
+        :finishes
+
+      interval1.last == interval2.last and lt?(interval1.first, interval2.first) ->
+        :finished_by
+
+      gt?(interval1.first, interval2.first) and lt?(interval1.last, interval2.last) ->
+        :during
+
+      lt?(interval1.first, interval2.first) and gt?(interval1.last, interval2.last) ->
+        :contains
+
+      lt?(interval1.first, interval2.first) and lt?(interval1.last, interval2.last) and
+          gt?(interval1.last, interval2.first) ->
+        :overlaps
+
+      gt?(interval1.first, interval2.first) and gt?(interval1.last, interval2.last) and
+          lt?(interval1.first, interval2.last) ->
+        :overlapped_by
     end
   end
 
