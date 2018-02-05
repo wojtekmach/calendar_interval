@@ -669,7 +669,19 @@ defmodule CalendarInterval do
       member?(interval, ndt)
     end
 
-    def slice(_), do: {:error, __MODULE__}
+    def slice(interval) do
+      {:ok, CalendarInterval.count(interval), &slice(interval, &1, &2)}
+    end
+
+    defp slice(first, start, count) do
+      slice(CalendarInterval.next(first, start), count)
+    end
+
+    defp slice(current, 1), do: [current]
+
+    defp slice(current, remaining) do
+      [current | slice(CalendarInterval.next(current), remaining - 1)]
+    end
 
     def reduce(interval, acc, fun) do
       current = CalendarInterval.new(interval.first, interval.precision)
