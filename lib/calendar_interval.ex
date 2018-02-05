@@ -2,8 +2,16 @@ defmodule CalendarInterval do
   @moduledoc """
   Functions for working with calendar intervals.
 
+  Key ideas:
+  * Time is enumerable: "2018" is a collection of "2018-01/2018-12" months, "2018-01-01/2018-12-31" days etc
+  * Everything is an interval: "2018" is an interval of 1 year, or 12 months, or 365 days etc long.
+    A timestamp with microsecond precision is an interval 1 microsecond long
+  * Allen's Interval Algebra: formalism for relations between time intervals
+
+  Functions:
+
   * Text representation functions: `parse!/1`, `to_string/1`, `sigil_I/2`
-  * "Countable Time" [1] operations: `enclosing/2`, `nest/2`, `next/1`, `prev/1`
+  * "Countable Time" [1] operations: `enclosing/2`, `nest/2`, `next/2`, `prev/2`
   * Set-like operations: `intersection/2`, `union/2`
   * Allen's Interval Algebra: `relation/2` (replacement for `==`, `>=` etc)
   * Other functions: `new/2`, `utc_now/1`, `split/2`

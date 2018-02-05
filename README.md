@@ -4,6 +4,12 @@
 
 Functions for working with calendar intervals.
 
+Key ideas:
+* Time is enumerable: "2018" is a collection of "2018-01/2018-12" months, "2018-01-01/2018-12-31" days etc
+* Everything is an interval: "2018" is an interval of 1 year, or 12 months, or 365 days etc.
+  A timestamp with microsecond precision is an interval 1 microsecond long
+* Allen's Interval Algebra: formalism for relations between time intervals
+
 ## Examples
 
 ```elixir
