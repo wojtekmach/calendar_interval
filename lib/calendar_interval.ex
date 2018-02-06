@@ -388,9 +388,11 @@ defmodule CalendarInterval do
   """
   @spec next(t(), step :: integer()) :: t()
   def next(interval, step \\ 1)
+
   def next(interval, 0) do
     interval
   end
+
   def next(%CalendarInterval{last: last, precision: precision} = interval, step) when step > 0 do
     count = count(interval)
 
@@ -425,15 +427,18 @@ defmodule CalendarInterval do
   """
   @spec prev(t(), step :: integer()) :: t()
   def prev(interval, step \\ 1)
+
   def prev(interval, 0) do
     interval
   end
-  def prev(%CalendarInterval{first: first, precision: precision} = interval, step) when step >= 0 do
+
+  def prev(%CalendarInterval{first: first, precision: precision} = interval, step)
+      when step >= 0 do
     count = count(interval)
 
     first =
       first
-      |> prev_ndt(precision, count * (step))
+      |> prev_ndt(precision, count * step)
 
     last =
       first
