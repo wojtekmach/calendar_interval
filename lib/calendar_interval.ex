@@ -382,6 +382,8 @@ defmodule CalendarInterval do
 
       iex> CalendarInterval.next(~I"2018-01/06")
       ~I"2018-07/12"
+      iex> CalendarInterval.next(~I"2018-01/02", 2)
+      ~I"2018-05/06"
 
   """
   @spec next(t(), step :: integer()) :: t()
@@ -414,6 +416,8 @@ defmodule CalendarInterval do
 
       iex> CalendarInterval.prev(~I"2018-07/12")
       ~I"2018-01/06"
+      iex> CalendarInterval.prev(~I"2018-05/06", 2)
+      ~I"2018-01/02"
 
   """
   @spec prev(t(), step :: integer()) :: t()
