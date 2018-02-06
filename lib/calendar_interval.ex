@@ -282,13 +282,13 @@ defmodule CalendarInterval do
   defp prev_ndt(ndt, :year, step), do: update_in(ndt.year, &(&1 - step))
 
   # TODO: handle step != 1
-  defp prev_ndt(%NaiveDateTime{year: year, month: 1} = ndt, :month, 1) do
-    %{ndt | year: year - 1, month: 12}
+  defp prev_ndt(%NaiveDateTime{year: year, month: 1} = ndt, :month, step) do
+    %{ndt | year: year - 1, month: 12 - step + 1}
   end
 
   # TODO: handle step != 1
-  defp prev_ndt(%NaiveDateTime{month: month} = ndt, :month, 1) do
-    %{ndt | month: month - 1}
+  defp prev_ndt(%NaiveDateTime{month: month} = ndt, :month, step) do
+    %{ndt | month: month - step}
   end
 
   defp prev_ndt(ndt, precision, step) do
@@ -412,16 +412,25 @@ defmodule CalendarInterval do
       iex> CalendarInterval.prev(~I"2018-06-01 01:00", 80)
       ~I"2018-05-31 23:40"
 
-      iex> CalendarInterval.prev(~I"2018-09/12")
-      ~I"2018-08"
+      iex> CalendarInterval.prev(~I"2018-07/12")
+      ~I"2018-01/06"
 
   """
   @spec prev(t(), step :: integer()) :: t()
-  def prev(%CalendarInterval{first: first, precision: precision}, step \\ 1)
+  def prev(%CalendarInterval{first: first, precision: precision} = interval, step \\ 1)
       when step >= 0 do
-    first
-    |> prev_ndt(precision, step)
-    |> new(precision)
+    count = count(interval)
+
+    first =
+      first
+      |> prev_ndt(precision, count * (step))
+
+    last =
+      first
+      |> next_ndt(precision, count)
+      |> prev_ndt(@microsecond, 1)
+
+    new(first, last, precision)
   end
 
   @doc """
