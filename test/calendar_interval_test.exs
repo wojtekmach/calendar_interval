@@ -2,29 +2,30 @@ defmodule CalendarIntervalTest do
   use ExUnit.Case
   use CalendarInterval
   doctest CalendarInterval
+  alias CalendarInterval, as: I
 
   test "parse!/1" do
-    i = CalendarInterval.parse!("2018")
+    i = I.parse!("2018")
     assert i.precision == :year
     assert i.first == ~N"2018-01-01 00:00:00.000000"
     assert i.last == ~N"2018-12-31 23:59:59.999999"
 
-    i = CalendarInterval.parse!("2018-06-15")
+    i = I.parse!("2018-06-15")
     assert i.precision == :day
     assert i.first == ~N"2018-06-15 00:00:00.000000"
     assert i.last == ~N"2018-06-15 23:59:59.999999"
 
-    i = CalendarInterval.parse!("2018-06-15 10:20:30.123")
+    i = I.parse!("2018-06-15 10:20:30.123")
     assert i.precision == {:microsecond, 3}
     assert i.first == ~N"2018-06-15 10:20:30.123000"
     assert i.last == ~N"2018-06-15 10:20:30.123999"
 
-    i = CalendarInterval.parse!("2018-06-15 10:20:30.123456")
+    i = I.parse!("2018-06-15 10:20:30.123456")
     assert i.precision == {:microsecond, 6}
     assert i.first == ~N"2018-06-15 10:20:30.123456"
     assert i.last == ~N"2018-06-15 10:20:30.123456"
 
-    i = CalendarInterval.parse!("2018-06-15/16")
+    i = I.parse!("2018-06-15/16")
     assert i.precision == :day
     assert i.first == ~N"2018-06-15 00:00:00.000000"
     assert i.last == ~N"2018-06-16 23:59:59.999999"
@@ -50,17 +51,17 @@ defmodule CalendarIntervalTest do
 
   for s <- @table do
     test "to_string/1: #{s}" do
-      assert CalendarInterval.to_string(CalendarInterval.parse!(unquote(s))) == unquote(s)
+      assert I.to_string(I.parse!(unquote(s))) == unquote(s)
     end
   end
 
   test "next/1" do
-    i = CalendarInterval.next(~I"2018-01")
+    i = I.next(~I"2018-01")
     assert i.precision == :month
     assert i.first == ~N"2018-02-01 00:00:00.000000"
     assert i.last == ~N"2018-02-28 23:59:59.999999"
 
-    i = CalendarInterval.next(~I"2018-01/02")
+    i = I.next(~I"2018-01/02")
     assert i == ~I"2018-03"
     assert i.precision == :month
     assert i.first == ~N"2018-03-01 00:00:00.000000"
@@ -68,12 +69,12 @@ defmodule CalendarIntervalTest do
   end
 
   test "prev/1" do
-    i = CalendarInterval.prev(~I"2018-01")
+    i = I.prev(~I"2018-01")
     assert i.precision == :month
     assert i.first == ~N"2017-12-01 00:00:00.000000"
     assert i.last == ~N"2017-12-31 23:59:59.999999"
 
-    i = CalendarInterval.prev(~I"2017-04/06")
+    i = I.prev(~I"2017-04/06")
     assert i.precision == :month
     assert i.first == ~N"2017-03-01 00:00:00.000000"
     assert i.last == ~N"2017-03-31 23:59:59.999999"
@@ -82,27 +83,27 @@ defmodule CalendarIntervalTest do
   test "enclosing/1" do
     interval = ~I"2018-02-03 10:20:30.123456"
 
-    i = CalendarInterval.enclosing(interval, {:microsecond, 3})
+    i = I.enclosing(interval, {:microsecond, 3})
     assert i.first == ~N"2018-02-03 10:20:30.123000"
     assert i.last == ~N"2018-02-03 10:20:30.123999"
 
-    i = CalendarInterval.enclosing(interval, :second)
+    i = I.enclosing(interval, :second)
     assert i.first == ~N"2018-02-03 10:20:30.000000"
     assert i.last == ~N"2018-02-03 10:20:30.999999"
 
-    i = CalendarInterval.enclosing(interval, :minute)
+    i = I.enclosing(interval, :minute)
     assert i.first == ~N"2018-02-03 10:20:00.000000"
     assert i.last == ~N"2018-02-03 10:20:59.999999"
 
-    i = CalendarInterval.enclosing(interval, :hour)
+    i = I.enclosing(interval, :hour)
     assert i.first == ~N"2018-02-03 10:00:00.000000"
     assert i.last == ~N"2018-02-03 10:59:59.999999"
 
-    i = CalendarInterval.enclosing(interval, :day)
+    i = I.enclosing(interval, :day)
     assert i.first == ~N"2018-02-03 00:00:00.000000"
     assert i.last == ~N"2018-02-03 23:59:59.999999"
 
-    i = CalendarInterval.enclosing(interval, :month)
+    i = I.enclosing(interval, :month)
     assert i.first == ~N"2018-02-01 00:00:00.000000"
     assert i.last == ~N"2018-02-28 23:59:59.999999"
   end
