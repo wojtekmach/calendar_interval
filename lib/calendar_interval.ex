@@ -387,8 +387,11 @@ defmodule CalendarInterval do
 
   """
   @spec next(t(), step :: integer()) :: t()
-  def next(%CalendarInterval{last: last, precision: precision} = interval, step \\ 1)
-      when step > 0 do
+  def next(interval, step \\ 1)
+  def next(interval, 0) do
+    interval
+  end
+  def next(%CalendarInterval{last: last, precision: precision} = interval, step) when step > 0 do
     count = count(interval)
 
     first =
@@ -421,8 +424,11 @@ defmodule CalendarInterval do
 
   """
   @spec prev(t(), step :: integer()) :: t()
-  def prev(%CalendarInterval{first: first, precision: precision} = interval, step \\ 1)
-      when step >= 0 do
+  def prev(interval, step \\ 1)
+  def prev(interval, 0) do
+    interval
+  end
+  def prev(%CalendarInterval{first: first, precision: precision} = interval, step) when step >= 0 do
     count = count(interval)
 
     first =
@@ -713,7 +719,11 @@ defmodule CalendarInterval do
     end
 
     defp slice(first, start, count) do
-      slice(CalendarInterval.next(first, start), count)
+      interval =
+        CalendarInterval.new(first.first, first.precision)
+        |> CalendarInterval.next(start - 1)
+
+      slice(interval, count)
     end
 
     defp slice(current, 1), do: [current]

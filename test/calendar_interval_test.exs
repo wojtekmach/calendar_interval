@@ -142,6 +142,10 @@ defmodule CalendarIntervalTest do
     assert Enum.count(~I"2018-01/12") == 12
     assert Enum.count(~I"2018-01-01/12-31") == 365
     assert Enum.count(~I"2016-01-01/12-31") == 366
+
+    interval = ~I"2018-01-01/31"
+    assert Enum.at(interval, 0) == Enum.at(Enum.to_list(interval), 0)
+    assert Enum.at(interval, 1) == Enum.at(Enum.to_list(interval), 1)
   end
 
   test "relation" do
