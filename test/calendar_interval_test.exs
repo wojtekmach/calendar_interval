@@ -62,10 +62,16 @@ defmodule CalendarIntervalTest do
     assert i.last == ~N"2018-02-28 23:59:59.999999"
 
     i = I.next(~I"2018-01/02")
-    assert i == ~I"2018-03"
+    assert i == ~I"2018-03/04"
     assert i.precision == :month
     assert i.first == ~N"2018-03-01 00:00:00.000000"
-    assert i.last == ~N"2018-03-31 23:59:59.999999"
+    assert i.last == ~N"2018-04-30 23:59:59.999999"
+
+    i = I.next(~I"2018-01/02", 2)
+    assert i == ~I"2018-05/06"
+    assert i.precision == :month
+    assert i.first == ~N"2018-05-01 00:00:00.000000"
+    assert i.last == ~N"2018-06-30 23:59:59.999999"
   end
 
   test "prev/1" do

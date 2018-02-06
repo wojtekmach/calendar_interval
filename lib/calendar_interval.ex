@@ -381,16 +381,25 @@ defmodule CalendarInterval do
       ~I"2018-06-30 10:20"
 
       iex> CalendarInterval.next(~I"2018-01/06")
-      ~I"2018-07"
+      ~I"2018-07/12"
 
   """
   @spec next(t(), step :: integer()) :: t()
-  def next(%CalendarInterval{last: last, precision: precision}, step \\ 1)
+  def next(%CalendarInterval{last: last, precision: precision} = interval, step \\ 1)
       when step > 0 do
-    last
-    |> next_ndt(@microsecond, 1)
-    |> next_ndt(precision, step - 1)
-    |> new(precision)
+    count = count(interval)
+
+    first =
+      last
+      |> next_ndt(@microsecond, 1)
+      |> next_ndt(precision, count * (step - 1))
+
+    last =
+      first
+      |> next_ndt(precision, count)
+      |> prev_ndt(@microsecond, 1)
+
+    new(first, last, precision)
   end
 
   @doc """
