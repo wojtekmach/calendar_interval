@@ -1,4 +1,6 @@
 %{
   "earmark": {:hex, :earmark, "1.2.4", "99b637c62a4d65a20a9fb674b8cffb8baa771c04605a80c911c4418c69b75439", [:mix], [], "hexpm"},
   "ex_doc": {:git, "https://github.com/elixir-lang/ex_doc.git", "c52cff4cf1f292ef7df0d2426ffbdac98d6391a7", []},
+  "nimble_parsec": {:git, "https://github.com/plataformatec/nimble_parsec.git", "6737ed395cc0a0a44c73adf4bae11b10a9fbc288", []},
+  "recurrence": {:git, "https://github.com/wojtekmach/recurrence.git", "489de1421aee0f06e34b21b0f07405c45e4996f4", []},
 }

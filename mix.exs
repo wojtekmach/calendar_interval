@@ -30,6 +30,7 @@ defmodule CalendarInterval.MixProject do
 
   defp deps do
     [
+      {:recurrence, github: "wojtekmach/recurrence", optional: true},
       {:ex_doc, github: "elixir-lang/ex_doc", only: :dev}
     ]
   end
