@@ -1,4 +1,5 @@
 %{
+  "calendar_recurrence": {:git, "https://github.com/wojtekmach/calendar_recurrence.git", "84c8a9f9a9b39555360da0fe47ac937b093dca8c", []},
   "earmark": {:hex, :earmark, "1.2.4", "99b637c62a4d65a20a9fb674b8cffb8baa771c04605a80c911c4418c69b75439", [:mix], [], "hexpm"},
   "ex_doc": {:git, "https://github.com/elixir-lang/ex_doc.git", "c52cff4cf1f292ef7df0d2426ffbdac98d6391a7", []},
   "nimble_parsec": {:git, "https://github.com/plataformatec/nimble_parsec.git", "6737ed395cc0a0a44c73adf4bae11b10a9fbc288", []},
