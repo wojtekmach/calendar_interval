@@ -191,6 +191,8 @@ defmodule CalendarInterval do
 
   defp new(%NaiveDateTime{} = first, %NaiveDateTime{} = last, precision)
        when precision in @precisions do
+    # Ensure correct order of first/last date
+    [first, last] = Enum.sort([first, last], &lt?/2)
     %CalendarInterval{first: first, last: last, precision: precision}
   end
 
@@ -247,7 +249,9 @@ defmodule CalendarInterval do
         right = String.slice(left, 0, byte_size(left) - byte_size(right)) <> right
         right = parse!(right)
         left = parse!(left)
-        new(left.first, right.last, left.precision)
+        first = min_ndt(left.first, right.first)
+        last = max_ndt(left.last, right.last)
+        new(first, last, left.precision)
     end
   end
 

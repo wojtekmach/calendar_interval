@@ -29,6 +29,11 @@ defmodule CalendarIntervalTest do
     assert i.precision == :day
     assert i.first == ~N"2018-06-15 00:00:00.000000"
     assert i.last == ~N"2018-06-16 23:59:59.999999"
+
+    i = I.parse!("2018-06-15/14")
+    assert i.precision == :day
+    assert i.first == ~N"2018-06-14 00:00:00.000000"
+    assert i.last == ~N"2018-06-15 23:59:59.999999"
   end
 
   @table [
@@ -52,6 +57,19 @@ defmodule CalendarIntervalTest do
   for s <- @table do
     test "to_string/1: #{s}" do
       assert I.to_string(I.parse!(unquote(s))) == unquote(s)
+    end
+  end
+
+  @table [
+    {"2019/2018", "2018/2019"},
+    {"2018-02/01", "2018-01/02"},
+    {"2019-02/2018-01", "2018-01/2019-02"},
+    {"2018-12-31 23:59:59/00:00", "2018-12-31 23:00:00/59:59"}
+  ]
+
+  for {s, r} <- @table do
+    test "to_string/1: #{s} => #{r}" do
+      assert I.to_string(I.parse!(unquote(s))) == unquote(r)
     end
   end
 
