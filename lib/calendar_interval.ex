@@ -1,49 +1,6 @@
 defmodule CalendarInterval do
   @moduledoc """
   Functions for working with calendar intervals.
-
-  Key ideas:
-  * Time is enumerable: "2018" is a collection of "2018-01/2018-12" months, "2018-01-01/2018-12-31" days etc
-  * Everything is an interval: "2018" is an interval of 1 year, or 12 months, or 365 days etc long.
-    A timestamp with microsecond precision is an interval 1 microsecond long
-  * Allen's Interval Algebra: formalism for relations between time intervals
-
-  Functions:
-
-  * Text representation functions: `parse!/1`, `to_string/1`, `sigil_I/2`
-  * "Countable Time" [1] operations: `enclosing/2`, `nest/2`, `next/2`, `prev/2`
-  * Set-like operations: `intersection/2`, `union/2`
-  * Allen's Interval Algebra: `relation/2` (replacement for `==`, `>=` etc)
-  * Other functions: `new/2`, `utc_now/1`, `split/2`
-
-  ## Examples
-
-      use CalendarInterval
-
-      iex> ~I"2018-06".precision
-      :month
-
-      iex> CalendarInterval.next(~I"2018-12-31")
-      ~I"2019-01-01"
-
-      iex> CalendarInterval.nest(~I"2018-06-15", :minute)
-      ~I"2018-06-15 00:00/23:59"
-
-      iex> CalendarInterval.relation(~I"2018-01", ~I"2018-02/12")
-      :meets
-
-      iex> Enum.count(~I"2016-01-01/12-31")
-      366
-
-  ## References
-
-  This library is heavily inspired by "Exploring Time" talk by Eric Evans [1] where
-  he mentioned the concept of "Countable Time" and introduced me to
-  "Allen's Interval Algebra" [2].
-
-  - [1] <https://www.youtube.com/watch?v=Zm95cYAtAa8>
-  - [2] <https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html>
-
   """
 
   defstruct [:first, :last, :precision]
@@ -204,7 +161,7 @@ defmodule CalendarInterval do
   end
 
   @doc """
-  Returns an interval for the current UTC time in given `precision`.
+  Returns an interval for the current UTC time in given `t:precision/0`.
 
   ## Examples
 

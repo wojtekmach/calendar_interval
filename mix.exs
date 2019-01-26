@@ -1,36 +1,42 @@
 defmodule CalendarInterval.MixProject do
   use Mix.Project
 
-  @version "0.1.0-dev"
+  @version "0.1.0"
+  @source_url "https://github.com/wojtekmach/calendar_interval"
 
-  def project do
+  def project() do
     [
       app: :calendar_interval,
       version: @version,
       elixir: "~> 1.4",
       start_permanent: Mix.env() == :prod,
+      description: "Functions for working with calendar intervals",
       docs: docs(),
+      package: package(),
       deps: deps()
     ]
   end
 
-  def application do
+  defp package() do
     [
-      extra_applications: [:logger]
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => @source_url}
     ]
   end
 
   defp docs() do
     [
-      main: "CalendarInterval",
+      extras: ["README.md"],
+      main: "readme",
       source_url: "https://github.com/wojtekmach/calendar_interval",
       source_ref: "v#{@version}"
     ]
   end
 
-  defp deps do
+  defp deps() do
     [
-      {:ex_doc, github: "elixir-lang/ex_doc", only: :dev}
+      {:ex_doc, github: "elixir-lang/ex_doc", only: :dev},
+      {:dialyxir, "~> 1.0-rc", only: :dev}
     ]
   end
 end

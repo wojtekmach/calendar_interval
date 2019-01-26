@@ -1,7 +1,11 @@
 %{
   "calendar_recurrence": {:git, "https://github.com/wojtekmach/calendar_recurrence.git", "84c8a9f9a9b39555360da0fe47ac937b093dca8c", []},
+  "dialyxir": {:hex, :dialyxir, "1.0.0-rc.4", "71b42f5ee1b7628f3e3a6565f4617dfb02d127a0499ab3e72750455e986df001", [:mix], [{:erlex, "~> 0.1", [hex: :erlex, repo: "hexpm", optional: false]}], "hexpm"},
   "earmark": {:hex, :earmark, "1.2.4", "99b637c62a4d65a20a9fb674b8cffb8baa771c04605a80c911c4418c69b75439", [:mix], [], "hexpm"},
-  "ex_doc": {:git, "https://github.com/elixir-lang/ex_doc.git", "c52cff4cf1f292ef7df0d2426ffbdac98d6391a7", []},
-  "nimble_parsec": {:git, "https://github.com/plataformatec/nimble_parsec.git", "6737ed395cc0a0a44c73adf4bae11b10a9fbc288", []},
+  "erlex": {:hex, :erlex, "0.1.6", "c01c889363168d3fdd23f4211647d8a34c0f9a21ec726762312e08e083f3d47e", [:mix], [], "hexpm"},
+  "ex_doc": {:git, "https://github.com/elixir-lang/ex_doc.git", "860a231a64989fa2e7b65a7eeed4bb57a2784e10", []},
+  "makeup": {:hex, :makeup, "0.8.0", "9cf32aea71c7fe0a4b2e9246c2c4978f9070257e5c9ce6d4a28ec450a839b55f", [:mix], [{:nimble_parsec, "~> 0.5.0", [hex: :nimble_parsec, repo: "hexpm", optional: false]}], "hexpm"},
+  "makeup_elixir": {:hex, :makeup_elixir, "0.13.0", "be7a477997dcac2e48a9d695ec730b2d22418292675c75aa2d34ba0909dcdeda", [:mix], [{:makeup, "~> 0.8", [hex: :makeup, repo: "hexpm", optional: false]}], "hexpm"},
+  "nimble_parsec": {:hex, :nimble_parsec, "0.5.0", "90e2eca3d0266e5c53f8fbe0079694740b9c91b6747f2b7e3c5d21966bba8300", [:mix], [], "hexpm"},
   "recurrence": {:git, "https://github.com/wojtekmach/recurrence.git", "489de1421aee0f06e34b21b0f07405c45e4996f4", []},
 }

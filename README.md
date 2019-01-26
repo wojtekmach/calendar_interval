@@ -40,6 +40,10 @@ he mentioned the concept of "Countable Time" and introduced me to
 - [1] <https://www.youtube.com/watch?v=Zm95cYAtAa8>
 - [2] <https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html>
 
+I've also given a talk about some of these ideas at Empex NYC 2018:
+[video](https://www.youtube.com/watch?v=vUOA5GgYg9I),
+[slides](https://speakerdeck.com/wojtekmach/recurrences-and-intervals).
+
 ## Installation
 
 Add to `mix.exs`:
@@ -47,7 +51,7 @@ Add to `mix.exs`:
 ```elixir
 def deps do
   [
-    {:calendar_interval, github: "wojtekmach/calendar_interval"}
+    {:calendar_interval, "~> 0.1"}
   ]
 end
 ```
