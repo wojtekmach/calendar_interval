@@ -35,8 +35,8 @@ defmodule CalendarInterval.MixProject do
 
   defp deps() do
     [
-      {:ex_doc, github: "elixir-lang/ex_doc", only: :dev},
-      {:dialyxir, "~> 1.0-rc", only: :dev}
+      {:ex_doc, github: "elixir-lang/ex_doc", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0-rc", only: :dev, runtime: false}
     ]
   end
 end
