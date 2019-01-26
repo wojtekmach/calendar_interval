@@ -4,4 +4,4 @@ elixir:
   - 1.8
 script:
   - mix test
-  - mix run examples/gaps.exs
+  - MIX_ENV=test mix run examples/gaps.exs
