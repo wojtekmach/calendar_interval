@@ -191,7 +191,16 @@ defmodule CalendarInterval do
 
   defp new(%NaiveDateTime{} = first, %NaiveDateTime{} = last, precision)
        when precision in @precisions do
-    %CalendarInterval{first: first, last: last, precision: precision}
+    if NaiveDateTime.compare(first, last) in [:eq, :lt] do
+      %CalendarInterval{first: first, last: last, precision: precision}
+    else
+      first = format(first, precision)
+      last = format(last, precision)
+
+      raise ArgumentError, """
+      cannot create interval from #{first} and #{last}, descending intervals are not supported\
+      """
+    end
   end
 
   @doc """
