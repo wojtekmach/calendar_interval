@@ -1,7 +1,7 @@
 language: elixir
 elixir:
   - 1.4
-  - 1.6
+  - 1.8
 script:
   - mix test
   - mix run examples/gaps.exs
