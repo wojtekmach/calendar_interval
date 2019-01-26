@@ -371,6 +371,40 @@ defmodule CalendarInterval do
   end
 
   @doc """
+  Returns first element of the interval.
+
+  ## Examples
+
+      iex> CalendarInterval.first(~I"2018-01/12")
+      ~I"2018-01"
+
+      iex> CalendarInterval.first(~I"2018-01")
+      ~I"2018-01"
+
+  """
+  @spec first(t()) :: t()
+  def first(%CalendarInterval{first: first, precision: precision}) do
+    new(first, precision)
+  end
+
+  @doc """
+  Returns last element of the interval.
+
+  ## Examples
+
+      iex> CalendarInterval.last(~I"2018-01/12")
+      ~I"2018-12"
+
+      iex> CalendarInterval.last(~I"2018-01")
+      ~I"2018-01"
+
+  """
+  @spec last(t()) :: t()
+  def last(%CalendarInterval{last: last, precision: precision}) do
+    new(last, precision)
+  end
+
+  @doc """
   Returns next interval.
 
   ## Examples
