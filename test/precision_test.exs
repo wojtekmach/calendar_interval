@@ -2,42 +2,7 @@ defmodule CalendarInterval.PrecisionTest do
   use ExUnit.Case
   alias CalendarInterval.Precision
 
-  defmodule Quarter do
-    @behaviour CalendarInterval.Precision
-
-    @quarter_to_month %{
-      "1" => "01",
-      "2" => "04",
-      "3" => "07",
-      "4" => "10"
-    }
-
-    def to_iso8601(<<year::4-bytes, "Q", quarter::1-bytes>>)
-        when quarter in ["1", "2", "3", "4"] do
-      {:ok, :quarter, "#{year}-#{@quarter_to_month[quarter]}-01 00:00:00.000000"}
-    end
-
-    def to_iso8601(_), do: :nomatch
-
-    def format(ndt, :quarter) do
-      q =
-        case ndt.month do
-          1 -> 1
-          4 -> 2
-          7 -> 3
-          10 -> 4
-        end
-
-      "#{ndt.year}Q#{q}"
-    end
-
-    def register(list) do
-      Enum.flat_map(list, fn
-        {:year, _} = el -> [el, {:quarter, __MODULE__}]
-        el -> [el]
-      end)
-    end
-  end
+  Code.require_file("quarter.exs", "test/support")
 
   describe "default state" do
     test "precisions" do

@@ -11,8 +11,8 @@ defmodule CalendarInterval.Precision do
   @callback precisions() :: [precision, ...]
   @callback count(first :: NaiveDateTime.t(), last :: NaiveDateTime.t(), precision) ::
               non_neg_integer()
-  @callback prev_ndt(NaiveDateTime.t(), precision, non_neg_integer()) :: NaiveDateTime.t()
-  @callback next_ndt(NaiveDateTime.t(), precision, non_neg_integer()) :: NaiveDateTime.t()
+  @callback prev_ndt(NaiveDateTime.t(), precision, pos_integer()) :: NaiveDateTime.t()
+  @callback next_ndt(NaiveDateTime.t(), precision, pos_integer()) :: NaiveDateTime.t()
   @callback truncate(NaiveDateTime.t(), precision) :: NaiveDateTime.t()
 
   @doc "List all available precisions."
@@ -86,6 +86,8 @@ defmodule CalendarInterval.Precision do
 
   @doc "Go a number of steps back in time by the given precision."
   @spec prev_ndt(NaiveDateTime.t(), precision, non_neg_integer()) :: NaiveDateTime.t()
+  def prev_ndt(ndt, _precision, 0), do: ndt
+
   def prev_ndt(ndt, precision, step) do
     module = module_for_precision(precision)
     module.prev_ndt(ndt, precision, step)
@@ -93,6 +95,8 @@ defmodule CalendarInterval.Precision do
 
   @doc "Go a number of steps forward in time by the given precision."
   @spec next_ndt(NaiveDateTime.t(), precision, non_neg_integer()) :: NaiveDateTime.t()
+  def next_ndt(ndt, _precision, 0), do: ndt
+
   def next_ndt(ndt, precision, step) do
     module = module_for_precision(precision)
     module.next_ndt(ndt, precision, step)
@@ -180,21 +184,10 @@ for {precision, bytes, rest} <- patterns do
 
     def format_left_right(_, _), do: :nomatch
 
-    defdelegate count(first, last, precision),
-      to: CalendarInterval.CommonDateManipulation,
-      as: :common_count
-
-    defdelegate truncate(ndt, precision),
-      to: CalendarInterval.CommonDateManipulation,
-      as: :common_truncate
-
-    defdelegate prev_ndt(ndt, precision, step),
-      to: CalendarInterval.CommonDateManipulation,
-      as: :common_prev_ndt
-
-    defdelegate next_ndt(ndt, precision, step),
-      to: CalendarInterval.CommonDateManipulation,
-      as: :common_next_ndt
+    defdelegate count(first, last, precision), to: CalendarInterval.CommonDateManipulation
+    defdelegate prev_ndt(ndt, precision, step), to: CalendarInterval.CommonDateManipulation
+    defdelegate next_ndt(ndt, precision, step), to: CalendarInterval.CommonDateManipulation
+    defdelegate truncate(ndt, precision), to: CalendarInterval.CommonDateManipulation
   end
 end
 
@@ -237,19 +230,8 @@ defmodule CalendarInterval.Precision.module_name(:microsecond) do
 
   def precisions, do: unquote(Enum.map(@scales, &elem(&1, 0)))
 
-  defdelegate count(first, last, precision),
-    to: CalendarInterval.CommonDateManipulation,
-    as: :common_count
-
-  defdelegate prev_ndt(ndt, precision, step),
-    to: CalendarInterval.CommonDateManipulation,
-    as: :common_prev_ndt
-
-  defdelegate next_ndt(ndt, precision, step),
-    to: CalendarInterval.CommonDateManipulation,
-    as: :common_next_ndt
-
-  defdelegate truncate(ndt, precision),
-    to: CalendarInterval.CommonDateManipulation,
-    as: :common_truncate
+  defdelegate count(first, last, precision), to: CalendarInterval.CommonDateManipulation
+  defdelegate prev_ndt(ndt, precision, step), to: CalendarInterval.CommonDateManipulation
+  defdelegate next_ndt(ndt, precision, step), to: CalendarInterval.CommonDateManipulation
+  defdelegate truncate(ndt, precision), to: CalendarInterval.CommonDateManipulation
 end

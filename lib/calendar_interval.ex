@@ -186,8 +186,8 @@ defmodule CalendarInterval do
       :month
 
   """
-  defmacro sigil_I({:<<>>, _, [string]}, []) do
-    Macro.escape(parse!(string))
+  def sigil_I(string, []) do
+    parse!(string)
   end
 
   @doc """

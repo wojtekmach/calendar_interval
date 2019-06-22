@@ -4,6 +4,8 @@ defmodule CalendarIntervalTest do
   doctest CalendarInterval
   alias CalendarInterval, as: I
 
+  Code.require_file("quarter.exs", "test/support")
+
   test "parse!/1" do
     i = I.parse!("2018")
     assert i.precision == :year
@@ -174,5 +176,45 @@ defmodule CalendarIntervalTest do
 
     assert relation(~I"2000/2015", ~I"2010/2020") == :overlaps
     assert relation(~I"2010/2020", ~I"2000/2015") == :overlapped_by
+  end
+
+  describe "with additional precision" do
+    setup do
+      Application.put_env(:calendar_interval, :precisions_modifier, {Quarter, :register})
+
+      on_exit(fn ->
+        Application.delete_env(:calendar_interval, :precisions_modifier)
+      end)
+    end
+
+    test "parse!1" do
+      i = I.parse!("2018Q3")
+      assert i.precision == :quarter
+      assert i.first == ~N"2018-07-01 00:00:00.000000"
+      assert i.last == ~N"2018-09-30 23:59:59.999999"
+      i = I.parse!("2018Q2/Q3")
+      assert i.precision == :quarter
+      assert i.first == ~N"2018-04-01 00:00:00.000000"
+      assert i.last == ~N"2018-09-30 23:59:59.999999"
+    end
+
+    test "to_string1" do
+      assert I.to_string(I.parse!("2018Q3")) == "2018Q3"
+      assert I.to_string(I.parse!("2018Q2/Q3")) == "2018Q2/Q3"
+    end
+
+    test "next/1" do
+      i = I.next(~I"2018Q2")
+      assert i.precision == :quarter
+      assert i.first == ~N"2018-07-01 00:00:00.000000"
+      assert i.last == ~N"2018-09-30 23:59:59.999999"
+    end
+
+    test "prev/1" do
+      i = I.prev(~I"2018Q4")
+      assert i.precision == :quarter
+      assert i.first == ~N"2018-07-01 00:00:00.000000"
+      assert i.last == ~N"2018-09-30 23:59:59.999999"
+    end
   end
 end
