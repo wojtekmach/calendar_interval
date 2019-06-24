@@ -2,6 +2,7 @@ defmodule CalendarInterval do
   @moduledoc """
   Functions for working with calendar intervals.
   """
+  alias CalendarInterval.Precision
 
   defstruct [:first, :last, :precision]
 
@@ -11,25 +12,11 @@ defmodule CalendarInterval do
           precision: precision()
         }
 
-  @type precision() :: :year | :month | :day | :hour | :minute | :second | {:microsecond, 1..6}
+  @type precision() :: CalendarInterval.Precision.precision()
 
-  @precisions [:year, :month, :day, :hour, :minute, :second] ++
-                for(i <- 1..6, do: {:microsecond, i})
-
-  @patterns [
-    {:year, 4, "-01-01 00:00:00.000000"},
-    {:month, 7, "-01 00:00:00.000000"},
-    {:day, 10, " 00:00:00.000000"},
-    {:hour, 13, ":00:00.000000"},
-    {:minute, 16, ":00.000000"},
-    {:second, 19, ".000000"},
-    {{:microsecond, 1}, 21, "00000"},
-    {{:microsecond, 2}, 22, "0000"},
-    {{:microsecond, 3}, 23, "000"},
-    {{:microsecond, 4}, 24, "00"},
-    {{:microsecond, 5}, 25, "0"}
-  ]
-
+  # Lowest possible precision
+  # Elixir does not support a better precision in it's datetime structs to this
+  # can be kept hardcoded.
   @microsecond {:microsecond, 6}
 
   @typedoc """
@@ -135,27 +122,39 @@ defmodule CalendarInterval do
 
   """
   @spec new(NaiveDateTime.t() | Date.t(), precision()) :: t()
-  def new(%NaiveDateTime{} = naive_datetime, precision) when precision in @precisions do
-    first = truncate(naive_datetime, precision)
-    last = first |> next_ndt(precision, 1) |> prev_ndt(@microsecond, 1)
+  def new(%NaiveDateTime{} = naive_datetime, precision) do
+    validate_precision(precision)
+    first = Precision.truncate(naive_datetime, precision)
+    last = first |> Precision.next_ndt(precision, 1) |> Precision.prev_ndt(@microsecond, 1)
     new(first, last, precision)
   end
 
-  def new(%Date{} = date, precision) when precision in @precisions do
+  def new(%Date{} = date, precision) do
+    validate_precision(precision)
     {:ok, ndt} = NaiveDateTime.new(date, ~T"00:00:00")
     new(ndt, precision)
   end
 
-  defp new(%NaiveDateTime{} = first, %NaiveDateTime{} = last, precision)
-       when precision in @precisions do
+  defp new(%NaiveDateTime{} = first, %NaiveDateTime{} = last, precision) do
+    validate_precision(precision)
+
     if NaiveDateTime.compare(first, last) in [:eq, :lt] do
       %CalendarInterval{first: first, last: last, precision: precision}
     else
-      first = format(first, precision)
-      last = format(last, precision)
+      first = Precision.format(first, precision)
+      last = Precision.format(last, precision)
 
       raise ArgumentError, """
-      cannot create interval from #{first} and #{last}, descending intervals are not supported\
+      Cannot create interval from #{first} and #{last}, descending intervals are not supported.\
+      """
+    end
+  end
+
+  defp validate_precision(precision) do
+    unless Precision.valid?(precision) do
+      raise ArgumentError, """
+      Cannot create interval with invalid precision #{inspect(precision)}. \
+      Available are #{inspect(Precision.precisions())}.\
       """
     end
   end
@@ -170,10 +169,11 @@ defmodule CalendarInterval do
 
   """
   @spec utc_now(precision()) :: t()
-  def utc_now(precision \\ @microsecond) when precision in @precisions do
+  def utc_now(precision \\ @microsecond) do
+    validate_precision(precision)
     now = NaiveDateTime.utc_now()
-    first = truncate(now, precision)
-    last = next_ndt(first, precision, 1) |> prev_ndt(@microsecond, 1)
+    first = Precision.truncate(now, precision)
+    last = Precision.next_ndt(first, precision, 1) |> Precision.prev_ndt(@microsecond, 1)
     new(first, last, precision)
   end
 
@@ -186,8 +186,8 @@ defmodule CalendarInterval do
       :month
 
   """
-  defmacro sigil_I({:<<>>, _, [string]}, []) do
-    Macro.escape(parse!(string))
+  def sigil_I(string, []) do
+    parse!(string)
   end
 
   @doc """
@@ -206,8 +206,8 @@ defmodule CalendarInterval do
   def parse!(string) do
     case String.split(string, "/", trim: true) do
       [string] ->
-        {ndt, precision} = do_parse!(string)
-        new(ndt, precision)
+        {:ok, precision, string} = Precision.parse(string)
+        new(NaiveDateTime.from_iso8601!(string), precision)
 
       [left, right] ->
         right = String.slice(left, 0, byte_size(left) - byte_size(right)) <> right
@@ -217,75 +217,9 @@ defmodule CalendarInterval do
     end
   end
 
-  for {precision, bytes, rest} <- @patterns do
-    defp do_parse!(<<_::unquote(bytes)-bytes>> = string) do
-      do_parse!(string <> unquote(rest))
-      |> put_elem(1, unquote(precision))
-    end
-  end
-
-  defp do_parse!(<<_::26-bytes>> = string) do
-    {NaiveDateTime.from_iso8601!(string), @microsecond}
-  end
-
-  defp next_ndt(ndt, :year, step), do: update_in(ndt.year, &(&1 + step))
-
-  defp next_ndt(%NaiveDateTime{year: year, month: month} = ndt, :month, step) do
-    {plus_year, month} = {div(month + step, 12), rem(month + step, 12)}
-
-    if month == 0 do
-      %{ndt | year: year + plus_year, month: 1}
-    else
-      %{ndt | year: year + plus_year, month: month}
-    end
-  end
-
-  defp next_ndt(ndt, precision, step) do
-    {count, unit} = precision_to_count_unit(precision)
-    NaiveDateTime.add(ndt, count * step, unit)
-  end
-
-  defp prev_ndt(ndt, :year, step), do: update_in(ndt.year, &(&1 - step))
-
-  # TODO: handle step != 1
-  defp prev_ndt(%NaiveDateTime{year: year, month: 1} = ndt, :month, step) do
-    %{ndt | year: year - 1, month: 12 - step + 1}
-  end
-
-  # TODO: handle step != 1
-  defp prev_ndt(%NaiveDateTime{month: month} = ndt, :month, step) do
-    %{ndt | month: month - step}
-  end
-
-  defp prev_ndt(ndt, precision, step) do
-    {count, unit} = precision_to_count_unit(precision)
-    NaiveDateTime.add(ndt, -count * step, unit)
-  end
-
-  defp precision_to_count_unit(:day), do: {24 * 60 * 60, :second}
-  defp precision_to_count_unit(:hour), do: {60 * 60, :second}
-  defp precision_to_count_unit(:minute), do: {60, :second}
-  defp precision_to_count_unit(:second), do: {1, :second}
-
-  defp precision_to_count_unit({:microsecond, exponent}) do
-    {1, Enum.reduce(1..exponent, 1, fn _, acc -> acc * 10 end)}
-  end
-
   @doc false
-  def count(%CalendarInterval{first: %{year: year1}, last: %{year: year2}, precision: :year}),
-    do: year2 - year1 + 1
-
-  def count(%CalendarInterval{
-        first: %{year: year1, month: month1},
-        last: %{year: year2, month: month2},
-        precision: :month
-      }),
-      do: month2 + year2 * 12 - month1 - year1 * 12 + 1
-
-  def count(%CalendarInterval{first: first, last: last, precision: precision}) do
-    {count, unit} = precision_to_count_unit(precision)
-    div(NaiveDateTime.diff(last, first, unit), count) + 1
-  end
+  def count(%CalendarInterval{first: first, last: last, precision: precision}),
+    do: Precision.count(first, last, precision)
 
   @doc """
   Returns string representation.
@@ -298,41 +232,13 @@ defmodule CalendarInterval do
   """
   @spec to_string(t()) :: String.t()
   def to_string(%CalendarInterval{first: first, last: last, precision: precision}) do
-    left = format(first, precision)
-    right = format(last, precision)
+    left = Precision.format(first, precision)
+    right = Precision.format(last, precision)
 
     if left == right do
       left
     else
-      format_left_right(left, right)
-    end
-  end
-
-  defp format_left_right(left, left) do
-    left
-  end
-
-  for i <- Enum.reverse([5, 8, 11, 14, 17, 20, 22, 23, 24, 25, 26]) do
-    defp format_left_right(
-           <<left::unquote(i)-bytes>> <> left_rest,
-           <<left::unquote(i)-bytes>> <> right_rest
-         ) do
-      left <> left_rest <> "/" <> right_rest
-    end
-  end
-
-  defp format_left_right(left, right) do
-    left <> "/" <> right
-  end
-
-  defp format(ndt, @microsecond) do
-    NaiveDateTime.to_string(ndt)
-  end
-
-  for {precision, bytes, _} <- @patterns do
-    defp format(ndt, unquote(precision)) do
-      NaiveDateTime.to_string(ndt)
-      |> String.slice(0, unquote(bytes))
+      Precision.format_left_right(left, right)
     end
   end
 
@@ -398,13 +304,13 @@ defmodule CalendarInterval do
 
     first =
       last
-      |> next_ndt(@microsecond, 1)
-      |> next_ndt(precision, count * (step - 1))
+      |> Precision.next_ndt(@microsecond, 1)
+      |> Precision.next_ndt(precision, count * (step - 1))
 
     last =
       first
-      |> next_ndt(precision, count)
-      |> prev_ndt(@microsecond, 1)
+      |> Precision.next_ndt(precision, count)
+      |> Precision.prev_ndt(@microsecond, 1)
 
     new(first, last, precision)
   end
@@ -438,12 +344,12 @@ defmodule CalendarInterval do
 
     first =
       first
-      |> prev_ndt(precision, count * step)
+      |> Precision.prev_ndt(precision, count * step)
 
     last =
       first
-      |> next_ndt(precision, count)
-      |> prev_ndt(@microsecond, 1)
+      |> Precision.next_ndt(precision, count)
+      |> Precision.prev_ndt(@microsecond, 1)
 
     new(first, last, precision)
   end
@@ -464,13 +370,19 @@ defmodule CalendarInterval do
 
   """
   @spec nest(t(), precision()) :: t()
-  def nest(%CalendarInterval{precision: old_precision} = interval, new_precision)
-      when new_precision in @precisions do
-    if precision_index(new_precision) > precision_index(old_precision) do
-      %{interval | precision: new_precision}
-    else
-      raise ArgumentError,
-            "cannot nest from #{inspect(old_precision)} to #{inspect(new_precision)}"
+  def nest(%CalendarInterval{precision: old_precision} = interval, new_precision) do
+    validate_precision(new_precision)
+
+    case Precision.compare(old_precision, new_precision) do
+      :eq ->
+        interval
+
+      :lt ->
+        %{interval | precision: new_precision}
+
+      _ ->
+        raise ArgumentError,
+              "cannot nest from #{inspect(old_precision)} to #{inspect(new_precision)}"
     end
   end
 
@@ -487,31 +399,20 @@ defmodule CalendarInterval do
 
   """
   @spec enclosing(t(), precision()) :: t()
-  def enclosing(%CalendarInterval{precision: old_precision} = interval, new_precision)
-      when new_precision in @precisions do
-    if precision_index(new_precision) < precision_index(old_precision) do
-      interval.first |> truncate(new_precision) |> new(new_precision)
-    else
-      raise ArgumentError,
-            "cannot enclose from #{inspect(old_precision)} to #{inspect(new_precision)}"
+  def enclosing(%CalendarInterval{precision: old_precision} = interval, new_precision) do
+    validate_precision(new_precision)
+
+    case Precision.compare(old_precision, new_precision) do
+      :eq ->
+        interval
+
+      :gt ->
+        interval.first |> Precision.truncate(new_precision) |> new(new_precision)
+
+      _ ->
+        raise ArgumentError,
+              "cannot enclose from #{inspect(old_precision)} to #{inspect(new_precision)}"
     end
-  end
-
-  defp truncate(ndt, :year), do: truncate(%{ndt | month: 1}, :month)
-  defp truncate(ndt, :month), do: truncate(%{ndt | day: 1}, :day)
-  defp truncate(ndt, :day), do: %{ndt | hour: 0, minute: 0, second: 0, microsecond: {0, 6}}
-  defp truncate(ndt, :hour), do: %{ndt | minute: 0, second: 0, microsecond: {0, 6}}
-  defp truncate(ndt, :minute), do: %{ndt | second: 0, microsecond: {0, 6}}
-  defp truncate(ndt, :second), do: %{ndt | microsecond: {0, 6}}
-  defp truncate(ndt, @microsecond), do: ndt
-
-  defp truncate(%{microsecond: {microsecond, _}} = ndt, {:microsecond, precision}) do
-    {1, n} = precision_to_count_unit({:microsecond, 6 - precision})
-    %{ndt | microsecond: {div(microsecond, n) * n, 6}}
-  end
-
-  for {precision, index} <- Enum.with_index(@precisions) do
-    defp precision_index(unquote(precision)), do: unquote(index)
   end
 
   @doc """
@@ -604,7 +505,7 @@ defmodule CalendarInterval do
   def union(interval1, interval2)
 
   def union(%CalendarInterval{precision: p} = i1, %CalendarInterval{precision: p} = i2) do
-    if intersection(i1, i2) != nil or next_ndt(i1.last, @microsecond, 1) == i2.first do
+    if intersection(i1, i2) != nil or Precision.next_ndt(i1.last, @microsecond, 1) == i2.first do
       new(i1.first, i2.last, p)
     else
       nil
@@ -644,10 +545,10 @@ defmodule CalendarInterval do
       interval1 == interval2 ->
         :equal
 
-      interval2.first == next_ndt(interval1.last, @microsecond, 1) ->
+      interval2.first == Precision.next_ndt(interval1.last, @microsecond, 1) ->
         :meets
 
-      interval2.last == prev_ndt(interval1.first, @microsecond, 1) ->
+      interval2.last == Precision.prev_ndt(interval1.first, @microsecond, 1) ->
         :met_by
 
       lt?(interval1.last, interval2.first) ->
