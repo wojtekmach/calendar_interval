@@ -1,7 +1,7 @@
 defmodule CalendarInterval.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
   @source_url "https://github.com/wojtekmach/calendar_interval"
 
   def project() do
@@ -36,6 +36,10 @@ defmodule CalendarInterval.MixProject do
   defp deps() do
     [
       {:ex_doc, github: "elixir-lang/ex_doc", only: :dev, runtime: false},
+
+      # A source of alternative calendars for testing
+      {:ex_cldr_calendars, "~> 1.1", only: [:dev, :test], optional: true},
+
       {:dialyxir, "~> 1.0-rc", only: :dev, runtime: false}
     ]
   end

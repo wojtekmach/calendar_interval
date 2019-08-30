@@ -51,7 +51,7 @@ Add to `mix.exs`:
 ```elixir
 def deps do
   [
-    {:calendar_interval, "~> 0.1"}
+    {:calendar_interval, "~> 0.2"}
   ]
 end
 ```
