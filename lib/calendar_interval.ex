@@ -11,10 +11,9 @@ defmodule CalendarInterval do
           precision: precision()
         }
 
-  @type precision() ::
-          :year | :quarter | :month | :day | :hour | :minute | :second | {:microsecond, 1..6}
+  @type precision() :: :year | :month | :day | :hour | :minute | :second | {:microsecond, 1..6}
 
-  @precisions [:year, :quarter, :month, :day, :hour, :minute, :second] ++
+  @precisions [:year, :month, :day, :hour, :minute, :second] ++
                 for(i <- 1..6, do: {:microsecond, i})
 
   @patterns [
@@ -44,17 +43,6 @@ defmodule CalendarInterval do
   """
   @callback add(Calendar.naive_datetime(), precision(), step :: integer()) ::
               {Calendar.year(), Calendar.month(), Calendar.day()}
-
-  @doc """
-  Callback that returns the quarter of the year for a given year, month and day
-  """
-  @callback quarter_of_year(Calendar.year(), Calendar.month(), Calendar.day()) :: pos_integer()
-
-  @doc """
-  Callback that returns a Date.Range representing the first date and last
-  date of a given year and quarter
-  """
-  @callback quarter(Calendar.year(), quarter :: 1..4) :: Date.Range.t()
 
   @typedoc """
   Relation between two intervals according to Allen's Interval Algebra.
@@ -259,23 +247,6 @@ defmodule CalendarInterval do
     end
   end
 
-  defp do_parse!(<<year::4-bytes, "-", q::utf8, quarter::utf8>>, Calendar.ISO = calendar)
-       when q in [?q, ?Q] and quarter in ?1..?4 do
-    year = String.to_integer(year)
-    month = (quarter - ?0 - 1) * 3 + 1
-    {:ok, ndt} = NaiveDateTime.new(year, month, 1, 0, 0, 0, {0, 6}, calendar)
-    {ndt, :quarter}
-  end
-
-  defp do_parse!(<<year::4-bytes, "-", q::utf8, quarter::utf8>>, calendar)
-       when q in [?q, ?Q] and quarter in ?1..?4 do
-    quarter = quarter - ?0
-    year = String.to_integer(year)
-    %{first: date} = calendar.quarter(year, quarter)
-    {:ok, ndt} = NaiveDateTime.new(date.year, date.month, date.day, 0, 0, 0, {0, 6}, calendar)
-    {ndt, :quarter}
-  end
-
   for {precision, bytes, rest} <- @patterns do
     defp do_parse!(<<_::unquote(bytes)-bytes>> = string, calendar) do
       do_parse!(string <> unquote(rest), calendar)
@@ -287,8 +258,6 @@ defmodule CalendarInterval do
     {NaiveDateTime.from_iso8601!(string, calendar), @microsecond}
   end
 
-  # Year increment
-
   defp next_ndt(%NaiveDateTime{calendar: Calendar.ISO} = ndt, :year, step) do
     update_in(ndt.year, &(&1 + step))
   end
@@ -296,18 +265,6 @@ defmodule CalendarInterval do
   defp next_ndt(%NaiveDateTime{calendar: calendar} = ndt, :year, step) do
     calendar.add(ndt, :year, step)
   end
-
-  # Quarter increment
-
-  defp next_ndt(%NaiveDateTime{calendar: Calendar.ISO} = ndt, :quarter, step) do
-    next_ndt(ndt, :month, step * 3)
-  end
-
-  defp next_ndt(%NaiveDateTime{calendar: calendar} = ndt, :quarter, step) do
-    calendar.add(ndt, :quarter, step)
-  end
-
-  # Month increment
 
   defp next_ndt(%NaiveDateTime{calendar: Calendar.ISO} = ndt, :month, step) do
     %{year: year, month: month} = ndt
@@ -324,9 +281,6 @@ defmodule CalendarInterval do
     calendar.add(ndt, :month, step)
   end
 
-  # All other increments can be done in terms of seconds or microseconds
-  # Incremented through NaiveDateTime
-
   defp next_ndt(ndt, precision, step) do
     {count, unit} = precision_to_count_unit(precision)
     NaiveDateTime.add(ndt, count * step, unit)
@@ -338,14 +292,6 @@ defmodule CalendarInterval do
 
   defp prev_ndt(%NaiveDateTime{calendar: calendar} = ndt, :year, step) do
     calendar.add(ndt, :year, -step)
-  end
-
-  defp prev_ndt(%NaiveDateTime{calendar: Calendar.ISO} = ndt, :quarter, step) do
-    prev_ndt(ndt, :month, step * 3)
-  end
-
-  defp prev_ndt(%NaiveDateTime{calendar: calendar} = ndt, :quarter, step) do
-    calendar.add(ndt, :quarter, -step)
   end
 
   # TODO: handle step != 1
@@ -380,9 +326,6 @@ defmodule CalendarInterval do
   def count(%CalendarInterval{first: %{year: year1}, last: %{year: year2}, precision: :year}),
     do: year2 - year1 + 1
 
-  def count(%CalendarInterval{precision: :quarter} = interval),
-    do: div(count(%CalendarInterval{interval | precision: :month}), 3)
-
   def count(%CalendarInterval{
         first: %{year: year1, month: month1},
         last: %{year: year2, month: month2},
@@ -405,7 +348,6 @@ defmodule CalendarInterval do
 
   """
   @spec to_string(t()) :: String.t()
-
   def to_string(%CalendarInterval{first: first, last: last, precision: precision}) do
     left = format(first, precision)
     right = format(last, precision)
@@ -436,16 +378,6 @@ defmodule CalendarInterval do
 
   defp format(ndt, @microsecond) do
     NaiveDateTime.to_string(ndt)
-  end
-
-  defp format(%{year: year, month: month, calendar: Calendar.ISO}, :quarter) do
-    quarter = div(month - 1, 3) + 1
-    Kernel.to_string(year) <> "-Q" <> Kernel.to_string(quarter)
-  end
-
-  defp format(%{year: year, month: month, day: day, calendar: calendar}, :quarter) do
-    quarter = calendar.quarter_of_year(year, month, day)
-    Kernel.to_string(year) <> "-Q" <> Kernel.to_string(quarter)
   end
 
   for {precision, bytes, _} <- @patterns do
@@ -625,7 +557,6 @@ defmodule CalendarInterval do
   end
 
   defp truncate(ndt, :year), do: truncate(%{ndt | month: 1}, :month)
-  defp truncate(ndt, :quarter), do: truncate(%{ndt | day: 1}, :day)
   defp truncate(ndt, :month), do: truncate(%{ndt | day: 1}, :day)
   defp truncate(ndt, :day), do: %{ndt | hour: 0, minute: 0, second: 0, microsecond: {0, 6}}
   defp truncate(ndt, :hour), do: %{ndt | minute: 0, second: 0, microsecond: {0, 6}}
