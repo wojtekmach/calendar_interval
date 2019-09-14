@@ -30,6 +30,11 @@ defmodule CalendarIntervalTest do
     assert i.first == ~N"2018-06-15 00:00:00.000000"
     assert i.last == ~N"2018-06-16 23:59:59.999999"
 
+    i = I.parse!("2018-01-01 00:00/03 23:59")
+    assert i.precision == :minute
+    assert i.first == ~N[2018-01-01 00:00:00.000000]
+    assert i.last == ~N[2018-01-03 23:59:59.999999]
+
     assert_raise ArgumentError, ~r"cannot create interval from 2018-06-15 and 2018-06-14", fn ->
       I.parse!("2018-06-15/14")
     end

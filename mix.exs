@@ -39,7 +39,6 @@ defmodule CalendarInterval.MixProject do
 
       # A source of alternative calendars for testing
       {:ex_cldr_calendars, "~> 1.1", only: [:dev, :test], optional: true},
-
       {:dialyxir, "~> 1.0-rc", only: :dev, runtime: false}
     ]
   end

@@ -233,17 +233,17 @@ defmodule CalendarInterval do
 
   defp parse_including_calendar(string) do
     case String.split(string, " ", trim: true) do
-      [string] ->
-        [string, Calendar.ISO]
+      [date, <<c::utf8, _rest::binary>> = calendar] when c in ?a..?z or c in ?A..?Z ->
+        [date, Module.concat([calendar])]
 
-      [date, <<d::utf8, _rest::binary>> = time] when d in ?0..?9 ->
-        [date <> " " <> time, Calendar.ISO]
-
-      [date, <<d::utf8, _rest::binary>> = time, calendar] when d in ?0..?9 ->
+      [date, time, <<c::utf8, _rest::binary>> = calendar] when c in ?a..?z or c in ?A..?Z ->
         [date <> " " <> time, Module.concat([calendar])]
 
-      [date, calendar] ->
-        [date, Module.concat([calendar])]
+      [date, time, other, <<c::utf8, _rest::binary>> = calendar] when c in ?a..?z or c in ?A..?Z ->
+        [date <> " " <> time <> " " <> other, Module.concat([calendar])]
+
+      other ->
+        [Enum.join(other, " "), Calendar.ISO]
     end
   end
 
