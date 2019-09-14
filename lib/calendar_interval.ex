@@ -41,7 +41,17 @@ defmodule CalendarInterval do
   and months. Incrementing other time precision is managed directly through
   `NaiveDateTime.add/3`.
   """
-  @callback add(Calendar.naive_datetime(), precision(), step :: integer()) ::
+  @callback add(
+              Calendar.year(),
+              Calendar.month(),
+              Calendar.day(),
+              Calendar.hour(),
+              Calendar.minute(),
+              Calendar.second(),
+              Calendar.microsecond(),
+              precision(),
+              step :: integer()
+            ) ::
               {Calendar.year(), Calendar.month(), Calendar.day()}
 
   @typedoc """
@@ -239,7 +249,8 @@ defmodule CalendarInterval do
       [date, time, <<c::utf8, _rest::binary>> = calendar] when c in ?a..?z or c in ?A..?Z ->
         {date <> " " <> time, Module.concat([calendar])}
 
-      [date, time, other, <<c::utf8, _rest::binary>> = calendar] when c in ?a..?z or c in ?A..?Z ->
+      [date, time, other, <<c::utf8, _rest::binary>> = calendar]
+      when c in ?a..?z or c in ?A..?Z ->
         {date <> " " <> time <> " " <> other, Module.concat([calendar])}
 
       other ->
@@ -263,7 +274,11 @@ defmodule CalendarInterval do
   end
 
   defp next_ndt(%NaiveDateTime{calendar: calendar} = ndt, :year, step) do
-    calendar.add(ndt, :year, step)
+    %{year: year, month: month, day: day, hour: hour, minute: minute, second: second, microsecond: microsecond} = ndt
+    {year, month, day, hour, minute, second, microsecond} =
+      calendar.add(year, month, day, hour, minute, second, microsecond, :year, step)
+    {:ok, ndt} = NaiveDateTime.new(year, month, day, hour, minute, second, microsecond, calendar)
+    ndt
   end
 
   defp next_ndt(%NaiveDateTime{calendar: Calendar.ISO} = ndt, :month, step) do
@@ -278,7 +293,11 @@ defmodule CalendarInterval do
   end
 
   defp next_ndt(%NaiveDateTime{calendar: calendar} = ndt, :month, step) do
-    calendar.add(ndt, :month, step)
+    %{year: year, month: month, day: day, hour: hour, minute: minute, second: second, microsecond: microsecond} = ndt
+    {year, month, day, hour, minute, second, microsecond} =
+      calendar.add(year, month, day, hour, minute, second, microsecond, :month, step)
+    {:ok, ndt} = NaiveDateTime.new(year, month, day, hour, minute, second, microsecond, calendar)
+    ndt
   end
 
   defp next_ndt(ndt, precision, step) do
@@ -291,7 +310,11 @@ defmodule CalendarInterval do
   end
 
   defp prev_ndt(%NaiveDateTime{calendar: calendar} = ndt, :year, step) do
-    calendar.add(ndt, :year, -step)
+    %{year: year, month: month, day: day, hour: hour, minute: minute, second: second, microsecond: microsecond} = ndt
+    {year, month, day, hour, minute, second, microsecond} =
+      calendar.add(year, month, day, hour, minute, second, microsecond, :year, -step)
+    {:ok, ndt} = NaiveDateTime.new(year, month, day, hour, minute, second, microsecond, calendar)
+    ndt
   end
 
   # TODO: handle step != 1
@@ -305,7 +328,11 @@ defmodule CalendarInterval do
   end
 
   defp prev_ndt(%NaiveDateTime{calendar: calendar} = ndt, :month, step) do
-    calendar.add(ndt, :month, -step)
+    %{year: year, month: month, day: day, hour: hour, minute: minute, second: second, microsecond: microsecond} = ndt
+    {year, month, day, hour, minute, second, microsecond} =
+      calendar.add(year, month, day, hour, minute, second, microsecond, :month, -step)
+    {:ok, ndt} = NaiveDateTime.new(year, month, day, hour, minute, second, microsecond, calendar)
+    ndt
   end
 
   defp prev_ndt(ndt, precision, step) do

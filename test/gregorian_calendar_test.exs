@@ -46,7 +46,10 @@ defmodule GregorianCalendarIntervalTest do
 
     i = I.parse!("2018-01-01 00:00/03 23:59 Cldr.Calendar.Gregorian")
     assert i.precision == :minute
-    assert i.first == ~N[2018-01-01 00:00:00.000000] |> Map.put(:calendar, Cldr.Calendar.Gregorian)
+
+    assert i.first ==
+             ~N[2018-01-01 00:00:00.000000] |> Map.put(:calendar, Cldr.Calendar.Gregorian)
+
     assert i.last == ~N[2018-01-03 23:59:59.999999] |> Map.put(:calendar, Cldr.Calendar.Gregorian)
   end
 
