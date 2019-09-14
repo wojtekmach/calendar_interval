@@ -216,7 +216,7 @@ defmodule CalendarInterval do
   """
   @spec parse!(String.t()) :: t()
   def parse!(string) do
-    [string, calendar] = parse_including_calendar(string)
+    {string, calendar} = parse_including_calendar(string)
 
     case String.split(string, "/", trim: true) do
       [string] ->
@@ -234,16 +234,16 @@ defmodule CalendarInterval do
   defp parse_including_calendar(string) do
     case String.split(string, " ", trim: true) do
       [date, <<c::utf8, _rest::binary>> = calendar] when c in ?a..?z or c in ?A..?Z ->
-        [date, Module.concat([calendar])]
+        {date, Module.concat([calendar])}
 
       [date, time, <<c::utf8, _rest::binary>> = calendar] when c in ?a..?z or c in ?A..?Z ->
-        [date <> " " <> time, Module.concat([calendar])]
+        {date <> " " <> time, Module.concat([calendar])}
 
       [date, time, other, <<c::utf8, _rest::binary>> = calendar] when c in ?a..?z or c in ?A..?Z ->
-        [date <> " " <> time <> " " <> other, Module.concat([calendar])]
+        {date <> " " <> time <> " " <> other, Module.concat([calendar])}
 
       other ->
-        [Enum.join(other, " "), Calendar.ISO]
+        {Enum.join(other, " "), Calendar.ISO}
     end
   end
 
