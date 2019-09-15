@@ -3,215 +3,113 @@ defmodule GregorianCalendarIntervalTest do
   use CalendarInterval
   alias CalendarInterval, as: I
 
-  def convert_to_holocene(ndt) do
-    year = ndt.year
-    %{ndt | year: year + 10_000, calendar: CalendarInterval.Holocene}
+  @doc """
+  Handles the sigil ~H for naive date times in the Holocene calendar.
+  """
+  defmacro sigil_H({:<<>>, _, [string]}, _) do
+    Macro.escape(
+      string
+      |> NaiveDateTime.from_iso8601!()
+      |> NaiveDateTime.convert!(CalendarInterval.Holocene)
+    )
   end
 
   test "parse!/1" do
     i = I.parse!("2018 CalendarInterval.Holocene")
     assert i.precision == :year
-
-    assert i.first ==
-             ~N"2018-01-01 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-12-31 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-01-01 00:00:00.000000"
+    assert i.last == ~H"2018-12-31 23:59:59.999999"
 
     i = I.parse!("2018-06-15 CalendarInterval.Holocene")
     assert i.precision == :day
-
-    assert i.first ==
-             ~N"2018-06-15 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-06-15 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-06-15 00:00:00.000000"
+    assert i.last == ~H"2018-06-15 23:59:59.999999"
 
     i = I.parse!("2018-06-15 10:20:30.123 CalendarInterval.Holocene")
     assert i.precision == {:microsecond, 3}
-
-    assert i.first ==
-             ~N"2018-06-15 10:20:30.123000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-06-15 10:20:30.123999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-06-15 10:20:30.123000"
+    assert i.last == ~H"2018-06-15 10:20:30.123999"
 
     i = I.parse!("2018-06-15 10:20:30.123456 CalendarInterval.Holocene")
     assert i.precision == {:microsecond, 6}
-
-    assert i.first ==
-             ~N"2018-06-15 10:20:30.123456"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-06-15 10:20:30.123456"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-06-15 10:20:30.123456"
+    assert i.last == ~H"2018-06-15 10:20:30.123456"
 
     i = I.parse!("2018-06-15/16 CalendarInterval.Holocene")
     assert i.precision == :day
-
-    assert i.first ==
-             ~N"2018-06-15 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-06-16 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-06-15 00:00:00.000000"
+    assert i.last == ~H"2018-06-16 23:59:59.999999"
 
     i = I.parse!("2018-01-01 00:00/03 23:59 CalendarInterval.Holocene")
     assert i.precision == :minute
-
-    assert i.first ==
-             ~N[2018-01-01 00:00:00.000000]
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N[2018-01-03 23:59:59.999999]
-             |> convert_to_holocene
+    assert i.first == ~H[2018-01-01 00:00:00.000000]
+    assert i.last == ~H[2018-01-03 23:59:59.999999]
   end
 
   test "next/1" do
     i = I.next(~I"2018-01 CalendarInterval.Holocene")
     assert i.precision == :month
-
-    assert i.first ==
-             ~N"2018-02-01 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-28 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-02-01 00:00:00.000000"
+    assert i.last == ~H"2018-02-28 23:59:59.999999"
 
     i = I.next(~I"2018-01/02 CalendarInterval.Holocene")
     assert i == ~I"2018-03/04 CalendarInterval.Holocene"
     assert i.precision == :month
-
-    assert i.first ==
-             ~N"2018-03-01 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-04-30 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-03-01 00:00:00.000000"
+    assert i.last == ~H"2018-04-30 23:59:59.999999"
 
     i = I.next(~I"2018-01/02 CalendarInterval.Holocene", 2)
     assert i == ~I"2018-05/06 CalendarInterval.Holocene"
     assert i.precision == :month
-
-    assert i.first ==
-             ~N"2018-05-01 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-06-30 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-05-01 00:00:00.000000"
+    assert i.last == ~H"2018-06-30 23:59:59.999999"
   end
 
   test "prev/1" do
     i = I.prev(~I"2018-01 CalendarInterval.Holocene")
     assert i.precision == :month
-
-    assert i.first ==
-             ~N"2017-12-01 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2017-12-31 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2017-12-01 00:00:00.000000"
+    assert i.last == ~H"2017-12-31 23:59:59.999999"
 
     i = I.prev(~I"2018-03/04 CalendarInterval.Holocene")
     assert i == ~I"2018-01/02 CalendarInterval.Holocene"
     assert i.precision == :month
-
-    assert i.first ==
-             ~N"2018-01-01 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-28 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-01-01 00:00:00.000000"
+    assert i.last == ~H"2018-02-28 23:59:59.999999"
 
     i = I.prev(~I"2018-05/06 CalendarInterval.Holocene", 2)
     assert i == ~I"2018-01/02 CalendarInterval.Holocene"
     assert i.precision == :month
-
-    assert i.first ==
-             ~N"2018-01-01 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-28 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-01-01 00:00:00.000000"
+    assert i.last == ~H"2018-02-28 23:59:59.999999"
   end
 
   test "enclosing/1" do
     interval = ~I"2018-02-03 10:20:30.123456 CalendarInterval.Holocene"
 
     i = I.enclosing(interval, {:microsecond, 3})
-
-    assert i.first ==
-             ~N"2018-02-03 10:20:30.123000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-03 10:20:30.123999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-02-03 10:20:30.123000"
+    assert i.last == ~H"2018-02-03 10:20:30.123999"
 
     i = I.enclosing(interval, :second)
-
-    assert i.first ==
-             ~N"2018-02-03 10:20:30.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-03 10:20:30.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-02-03 10:20:30.000000"
+    assert i.last == ~H"2018-02-03 10:20:30.999999"
 
     i = I.enclosing(interval, :minute)
-
-    assert i.first ==
-             ~N"2018-02-03 10:20:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-03 10:20:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-02-03 10:20:00.000000"
+    assert i.last == ~H"2018-02-03 10:20:59.999999"
 
     i = I.enclosing(interval, :hour)
-
-    assert i.first ==
-             ~N"2018-02-03 10:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-03 10:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-02-03 10:00:00.000000"
+    assert i.last == ~H"2018-02-03 10:59:59.999999"
 
     i = I.enclosing(interval, :day)
-
-    assert i.first ==
-             ~N"2018-02-03 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-03 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-02-03 00:00:00.000000"
+    assert i.last == ~H"2018-02-03 23:59:59.999999"
 
     i = I.enclosing(interval, :month)
-
-    assert i.first ==
-             ~N"2018-02-01 00:00:00.000000"
-             |> convert_to_holocene
-
-    assert i.last ==
-             ~N"2018-02-28 23:59:59.999999"
-             |> convert_to_holocene
+    assert i.first == ~H"2018-02-01 00:00:00.000000"
+    assert i.last == ~H"2018-02-28 23:59:59.999999"
   end
 
   test "enumerable" do
@@ -231,24 +129,14 @@ defmodule GregorianCalendarIntervalTest do
     assert ~I"2018-04-01 CalendarInterval.Holocene" in ~I"2018-03/05 CalendarInterval.Holocene"
     assert not (~I"2019-01-01 CalendarInterval.Holocene" in ~I"2018 CalendarInterval.Holocene")
 
-    assert (~N"2018-01-01 09:00:00"
-            |> Map.put(:calendar, CalendarInterval.Holocene)
-            |> convert_to_holocene) in ~I"2018 CalendarInterval.Holocene"
+    assert ~H"2018-01-01 09:00:00" in ~I"2018 CalendarInterval.Holocene"
 
-    assert (~N"2018-12-31 23:59:59"
-            |> Map.put(:calendar, CalendarInterval.Holocene)
-            |> convert_to_holocene) in ~I"2018 CalendarInterval.Holocene"
+    assert ~H"2018-12-31 23:59:59" in ~I"2018 CalendarInterval.Holocene"
 
-    assert not ((~N"2019-01-01 01:01:01"
-                 |> convert_to_holocene) in ~I"2018 CalendarInterval.Holocene")
+    refute ~H"2019-01-01 01:01:01" in ~I"2018 CalendarInterval.Holocene"
 
-    assert (~D"2018-01-01"
-            |> Map.put(:calendar, CalendarInterval.Holocene)
-            |> convert_to_holocene) in ~I"2018 CalendarInterval.Holocene"
-
-    assert not ((~D"2019-01-01"
-                 |> Map.put(:calendar, CalendarInterval.Holocene)
-                 |> convert_to_holocene) in ~I"2018 CalendarInterval.Holocene")
+    assert NaiveDateTime.to_date(~H"2018-01-01 00:00:00") in ~I"2018 CalendarInterval.Holocene"
+    refute NaiveDateTime.to_date(~H"2019-01-01 00:00:00") in ~I"2018 CalendarInterval.Holocene"
 
     assert Enum.count(~I"2018-01/12 CalendarInterval.Holocene") == 12
     assert Enum.count(~I"2018-01-01/12-31 CalendarInterval.Holocene") == 365

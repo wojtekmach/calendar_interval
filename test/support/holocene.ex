@@ -56,7 +56,7 @@ defmodule CalendarInterval.Holocene do
 
   @impl true
   def naive_datetime_to_string(year, month, day, hour, minute, second, microsecond) do
-    "#{year}-#{month}-#{day}" <>
+    "#{year}-#{month}-#{day} " <>
       Calendar.ISO.time_to_string(hour, minute, second, microsecond) <> " (HE)"
   end
 
