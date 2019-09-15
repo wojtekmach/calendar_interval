@@ -1,11 +1,16 @@
 %{
   "calendar_recurrence": {:git, "https://github.com/wojtekmach/calendar_recurrence.git", "84c8a9f9a9b39555360da0fe47ac937b093dca8c", []},
+  "cldr_utils": {:hex, :cldr_utils, "2.4.0", "53609273da803395e12f288cc25587ddb2238b533633b432471193c5f8b0d96a", [:mix], [{:decimal, "~> 1.5", [hex: :decimal, repo: "hexpm", optional: false]}], "hexpm"},
+  "decimal": {:hex, :decimal, "1.8.0", "ca462e0d885f09a1c5a342dbd7c1dcf27ea63548c65a65e67334f4b61803822e", [:mix], [], "hexpm"},
   "dialyxir": {:hex, :dialyxir, "1.0.0-rc.4", "71b42f5ee1b7628f3e3a6565f4617dfb02d127a0499ab3e72750455e986df001", [:mix], [{:erlex, "~> 0.1", [hex: :erlex, repo: "hexpm", optional: false]}], "hexpm"},
   "earmark": {:hex, :earmark, "1.2.4", "99b637c62a4d65a20a9fb674b8cffb8baa771c04605a80c911c4418c69b75439", [:mix], [], "hexpm"},
   "erlex": {:hex, :erlex, "0.1.6", "c01c889363168d3fdd23f4211647d8a34c0f9a21ec726762312e08e083f3d47e", [:mix], [], "hexpm"},
+  "ex_cldr": {:hex, :ex_cldr, "2.10.2", "5b9062c2a72b3a834ded2eeb49c8da77dde32f417fe523e884931af2a82cac7e", [:mix], [{:cldr_utils, "~> 2.3", [hex: :cldr_utils, repo: "hexpm", optional: false]}, {:decimal, "~> 1.6", [hex: :decimal, repo: "hexpm", optional: false]}, {:gettext, "~> 0.13", [hex: :gettext, repo: "hexpm", optional: true]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: true]}, {:nimble_parsec, "~> 0.5", [hex: :nimble_parsec, repo: "hexpm", optional: false]}, {:plug, "~> 1.4", [hex: :plug, repo: "hexpm", optional: true]}, {:telemetry, "~> 0.4.0", [hex: :telemetry, repo: "hexpm", optional: true]}], "hexpm"},
+  "ex_cldr_calendars": {:hex, :ex_cldr_calendars, "1.4.0", "c7adf1e752b0cbad6f565246a583f1d056ad05fdc0c7fb8b66d498d1b381225f", [:mix], [{:ex_cldr, "~> 2.8", [hex: :ex_cldr, repo: "hexpm", optional: false]}, {:ex_cldr_lists, "~> 2.4", [hex: :ex_cldr_lists, repo: "hexpm", optional: true]}, {:ex_cldr_units, "~> 2.0", [hex: :ex_cldr_units, repo: "hexpm", optional: true]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_doc": {:git, "https://github.com/elixir-lang/ex_doc.git", "860a231a64989fa2e7b65a7eeed4bb57a2784e10", []},
+  "jason": {:hex, :jason, "1.1.2", "b03dedea67a99223a2eaf9f1264ce37154564de899fd3d8b9a21b1a6fd64afe7", [:mix], [{:decimal, "~> 1.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm"},
   "makeup": {:hex, :makeup, "0.8.0", "9cf32aea71c7fe0a4b2e9246c2c4978f9070257e5c9ce6d4a28ec450a839b55f", [:mix], [{:nimble_parsec, "~> 0.5.0", [hex: :nimble_parsec, repo: "hexpm", optional: false]}], "hexpm"},
   "makeup_elixir": {:hex, :makeup_elixir, "0.13.0", "be7a477997dcac2e48a9d695ec730b2d22418292675c75aa2d34ba0909dcdeda", [:mix], [{:makeup, "~> 0.8", [hex: :makeup, repo: "hexpm", optional: false]}], "hexpm"},
-  "nimble_parsec": {:hex, :nimble_parsec, "0.5.0", "90e2eca3d0266e5c53f8fbe0079694740b9c91b6747f2b7e3c5d21966bba8300", [:mix], [], "hexpm"},
+  "nimble_parsec": {:hex, :nimble_parsec, "0.5.1", "c90796ecee0289dbb5ad16d3ad06f957b0cd1199769641c961cfe0b97db190e0", [:mix], [], "hexpm"},
   "recurrence": {:git, "https://github.com/wojtekmach/recurrence.git", "489de1421aee0f06e34b21b0f07405c45e4996f4", []},
 }
