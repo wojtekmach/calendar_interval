@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.2.0 (2019-xx-yy)
+## HEAD
 
 * Add compatibility with calendars other than `Calendar.ISO`.
 
