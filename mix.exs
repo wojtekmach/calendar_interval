@@ -13,7 +13,8 @@ defmodule CalendarInterval.MixProject do
       description: "Functions for working with calendar intervals",
       docs: docs(),
       package: package(),
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -36,10 +37,10 @@ defmodule CalendarInterval.MixProject do
   defp deps() do
     [
       {:ex_doc, github: "elixir-lang/ex_doc", only: :dev, runtime: false},
-
-      # A source of alternative calendars for testing
-      {:ex_cldr_calendars, "~> 1.4", only: [:dev, :test], optional: true},
       {:dialyxir, "~> 1.0-rc", only: :dev, runtime: false}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
