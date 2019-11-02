@@ -1,7 +1,7 @@
 defmodule CalendarInterval.MixProject do
   use Mix.Project
 
-  @version "0.1.1-dev"
+  @version "0.2.0"
   @source_url "https://github.com/wojtekmach/calendar_interval"
 
   def project() do
