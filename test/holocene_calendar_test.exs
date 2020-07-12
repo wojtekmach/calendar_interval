@@ -151,7 +151,7 @@ defmodule GregorianCalendarIntervalTest do
     import CalendarInterval, only: [relation: 2, sigil_I: 2]
 
     assert relation(~I"2018 CalendarInterval.Holocene", ~I"2018 CalendarInterval.Holocene") ==
-             :equal
+             :equals
 
     assert relation(~I"2017 CalendarInterval.Holocene", ~I"2018 CalendarInterval.Holocene") ==
              :meets

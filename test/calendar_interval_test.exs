@@ -160,7 +160,7 @@ defmodule CalendarIntervalTest do
   test "relation" do
     import CalendarInterval, only: [relation: 2, sigil_I: 2]
 
-    assert relation(~I"2018", ~I"2018") == :equal
+    assert relation(~I"2018", ~I"2018") == :equals
 
     assert relation(~I"2017", ~I"2018") == :meets
     assert relation(~I"2018", ~I"2017") == :met_by

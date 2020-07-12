@@ -124,7 +124,7 @@ defmodule CalendarInterval do
   See: <https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html>
   """
   @type relation() ::
-          :equal
+          :equals
           | :meets
           | :met_by
           | :precedes
@@ -768,7 +768,7 @@ defmodule CalendarInterval do
   def relation(%{precision: p} = interval1, %{precision: p} = interval2) do
     cond do
       interval1 == interval2 ->
-        :equal
+        :equals
 
       interval2.first == next_ndt(interval1.last, @microsecond, 1) ->
         :meets
