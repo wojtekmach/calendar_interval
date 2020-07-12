@@ -165,7 +165,7 @@ defmodule CalendarIntervalTest do
     assert relation(~I"2017", ~I"2018") == :meets
     assert relation(~I"2018", ~I"2017") == :met_by
 
-    assert relation(~I"2016", ~I"2018") == :preceds
+    assert relation(~I"2016", ~I"2018") == :precedes
     assert relation(~I"2018", ~I"2016") == :preceded_by
 
     assert relation(~I"2018", ~I"2018/2019") == :starts

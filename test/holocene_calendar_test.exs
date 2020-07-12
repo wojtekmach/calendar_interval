@@ -160,7 +160,7 @@ defmodule GregorianCalendarIntervalTest do
              :met_by
 
     assert relation(~I"2016 CalendarInterval.Holocene", ~I"2018 CalendarInterval.Holocene") ==
-             :preceds
+             :precedes
 
     assert relation(~I"2018 CalendarInterval.Holocene", ~I"2016 CalendarInterval.Holocene") ==
              :preceded_by
